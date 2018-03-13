@@ -1,0 +1,16 @@
+#include "resource.hpp"
+
+#include <windows.h>
+
+IDD_HEKTO_CONFIG DIALOG 0, 0, 150, 115
+STYLE DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Konfiguration"
+FONT 8, "MS Sans Serif"
+BEGIN
+  CHECKBOX   "&Beidseitig beschriften",           IDC_BEIDSEITIG,      10, 10, 130, 15, BS_AUTOCHECKBOX | WS_TABSTOP
+  CHECKBOX   "&Kleine Ausfuehrung",               IDC_KLEIN,           10, 25, 130, 15, BS_AUTOCHECKBOX | WS_TABSTOP
+  CHECKBOX   "&Rueckstrahlend",                   IDC_RUECKSTRAHLEND,  10, 40, 130, 15, BS_AUTOCHECKBOX | WS_TABSTOP
+  CHECKBOX   "&Ankerpunkt fuer NBUe-Kennzeichen", IDC_ANKERPUNKT,      10, 55, 130, 15, BS_AUTOCHECKBOX | WS_TABSTOP
+  CHECKBOX   "&Immer ohne Mast",                  IDC_IMMER_OHNE_MAST, 10, 70, 130, 15, BS_AUTOCHECKBOX | WS_TABSTOP
+  PUSHBUTTON "&OK",                               IDOK,                90, 91,  50, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+END
