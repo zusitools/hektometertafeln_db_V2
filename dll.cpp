@@ -49,7 +49,7 @@ DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
 }
 
 DLL_EXPORT const char* dllVersion() {
-  return "0.0.3";
+  return "0.0.4";
 }
 
 DLL_EXPORT const char* Autor() {
@@ -95,9 +95,10 @@ const char* GetDateiname(const BauParameter& bau_parameter, int zahl_oben, int z
 
 std::pair<int, int> BerechneZiffern(float wert_m) {
   assert(wert_m >= 0);
-  int wert_m_int = wert_m + 100;
+  // Runde auf Hektometer
   // TODO(me): negative Kilometerangaben
-  return std::make_pair(wert_m_int / 1000, ((wert_m_int % 1000) / 200) * 2);
+  int wert_m_int = wert_m + 50;
+  return std::make_pair(wert_m_int / 1000, (wert_m_int % 1000) / 100);
 }
 
 DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
