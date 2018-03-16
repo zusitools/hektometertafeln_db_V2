@@ -876,7 +876,7 @@ static constexpr std::array<Textur, 10> kZiffernTexturenGross = MakeZiffernTextu
 static constexpr std::array<Textur, 10> kZiffernTexturenKlein = MakeZiffernTexturen(false);
 
 // Z-Verschiebung fuer die hohe Variante der Tafel
-static constexpr float kZVerschiebungHoch = 2.5f;
+static constexpr float kZVerschiebungHoch = 2.4f;
 
 }  // namespace
 
