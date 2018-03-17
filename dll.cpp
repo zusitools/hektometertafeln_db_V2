@@ -13,6 +13,7 @@
 #include <utility>
 
 // Globale Variablen
+DWORD g_zusi_datenpfad_laenge;
 char g_zielverzeichnis[MAX_PATH];  // wird von Zusi beim Initialisieren gesetzt; ohne abschliessenden Slash/Backslash
 char g_outDatei[MAX_PATH];  // zwecks Rueckgabe an Zusi
 
@@ -31,11 +32,13 @@ enum class Standort : std::uint8_t {
 
 DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
   HKEY key;
-  DWORD len = MAX_PATH;
+  g_zusi_datenpfad_laenge = MAX_PATH;
   if (!SUCCEEDED(RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Zusi3", 0, KEY_READ | KEY_WOW64_32KEY, &key)) ||
-      !SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnis", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &len))) {
+      !SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnis", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
     return 0;
   }
+
+  g_zusi_datenpfad_laenge -= 1;  // pcbData ist inklusive Nullterminator
 
   if (!PathAppend(g_zielverzeichnis, zielverzeichnis)) {
     return 0;
@@ -45,11 +48,16 @@ DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
     return 0;
   }
 
+  // Der an Zusi zurueckgegebene Pfad soll keinen fuehrenden Backslash enthalten
+  if (g_zielverzeichnis[g_zusi_datenpfad_laenge - 1] != '\\') {
+    g_zusi_datenpfad_laenge += 1;
+  }
+
   return 1;
 }
 
 DLL_EXPORT const char* dllVersion() {
-  return "0.0.5";
+  return "0.0.6";
 }
 
 DLL_EXPORT const char* Autor() {
@@ -118,7 +126,7 @@ DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
     g_config.ankerpunkt
   };
 
-  *datei = GetDateiname(bauparameter, zahl_oben, ziffer_unten);
+  *datei = GetDateiname(bauparameter, zahl_oben, ziffer_unten) + g_zusi_datenpfad_laenge;
 
   FILE* fd = fopen(g_outDatei, "w");
   assert(fd != nullptr);
