@@ -456,15 +456,41 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
       ++j;
     }
   } else if (spielraum > 0) {
-    // Falls die Default-Abstaende ausreichen: Zentrieren
+    if (ziffern.size() > 1) {
+      // Falls links und rechts sehr viel Platz ist:
+      // Fuege gleichmaessig mehr Abstand zwischen den Ziffern ein, aber:
+      //  - beschraenke den Gesamtabstand auf den dreifachen Default-Abstand (+/- Kerning)
+      //  - lasse links und rechts mindestens den doppelten Default-Abstand Platz
+      for (int i = 0; i <= 2 * tp.def_ziffernabstand_mm; ++i) {
+        // Pruefe Abstand links/rechts nur 1x pro Iteration,
+        // da sich der Spielraum pro Iteration um max. 2mm verringert.
+        if (spielraum <= 2 * tp.def_ziffernabstand_mm) {
+          break;
+        }
+
+        for (size_t j = 1; j < result.size() - 1; ++j) {
+          if (result[j] < tp.max_ziffernabstand_mm) {
+            ++result[j];
+            --spielraum;
+          }
+        }
+      }
+    }
+
+    // Zentriere die Ziffern
     result.front() += spielraum / 2;
     spielraum -= spielraum / 2;
 
     result.back() += spielraum;
     spielraum -= spielraum;
+
   }
 
   assert(spielraum == 0);
+  for (size_t i = 1; i < result.size() - 1; ++i) {
+    assert(result[i] >= 0);
+    assert(result[i] <= tp.max_ziffernabstand_mm);
+  }
   return result;
 }
 
