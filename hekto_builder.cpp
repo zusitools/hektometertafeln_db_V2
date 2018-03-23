@@ -397,8 +397,8 @@ std::vector<int> GetZiffern(int zahl) {
     /* 4 */ {  0,  0,  5,  0,  0,  0,  0, 10,  0,  5,  0 },
     /* 5 */ {  0,  0, 10,  0, 10,  6,  0,  0,  0,  5,  0 },
     /* 6 */ {  6, 10, 10,  8,  5,  5, 15,  5,  0, 10,  0 },
-    /* 7 */ { 25,  5, 10, 10, 40, 25, 30,  0, 10,  5, 10 },
-    /* 8 */ {  4,  5,  5,  8, 10,  8,  0,  0,  0,  4,  0 },
+    /* 7 */ { 25,  5, 10, 10, 50, 25, 30,  0, 10,  5, 10 },
+    /* 8 */ {  4,  5,  5,  8, 15,  8,  0,  0,  0,  4,  0 },
     /* 9 */ {  0,  0,  0,  6, 20, 10,  8,  0,  0,  0,  0 },
     /*-1 */ {  0,  0,  0,  0, 10,  5,  0,  0,  0,  0,  0 },
   };
@@ -411,7 +411,7 @@ int GetZiffernAbstand(const TafelParameter& tp, int ziffer_links, int ziffer_rec
   int result = anzahl_ziffern * tp.def_ziffernabstand_mm
     - kKerning_mm[ziffer_links == -1 ? 10 : ziffer_links][ziffer_rechts == -1 ? 10 : ziffer_rechts]
       * (static_cast<float>(tp.ziffernhoehe_mm)/kKerningZiffernhoehe_mm);
-  return std::max(0, std::min(anzahl_ziffern * tp.max_ziffernabstand_mm, result));
+  return std::min(anzahl_ziffern * tp.max_ziffernabstand_mm, result);
 }
 
 std::vector<int> GetDefaultAbstaende(const TafelParameter& tp, const std::vector<int>& ziffern) {
@@ -426,8 +426,11 @@ std::vector<int> GetDefaultAbstaende(const TafelParameter& tp, const std::vector
 }
 
 // Berechnet Ziffernabstaende so, dass die Ziffern in die angegebene Gesamtbreite passen
+// und alle Abstaende >= 0 sind.
 std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& ziffern, const std::array<Textur, 10>& ziffern_texturen, int gesamtbreite_mm) {
   auto result = GetDefaultAbstaende(tp, ziffern);
+  // result kann an dieser Stelle noch negative Werte enthalten,
+  // die durch spaeteres Erhoehen der Ziffernabstaende ausgeglichen werden koennen.
 
   // Berechne Gesamtbreite und Spielraum
   int breite_summe = 0;
@@ -436,7 +439,7 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
     breite_summe += ziffern_texturen[ziffer].breite_mm;
   }
   for (const auto& abstand : result) {
-    breite_summe += abstand;
+    breite_summe += std::max(0, abstand);
     spielraum_verkleinern += abstand;
   }
 
@@ -449,6 +452,7 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
     size_t j = 0;
     for (int i = 0, end = -spielraum; i < end; ++i) {
       while (result[j % result.size()] <= 0) {
+        result[j % result.size()] = 0;  // keine Chance auf negatives Kerning in dieser Situation
         ++j;
       }
       result[j % result.size()] -= 1;
@@ -473,6 +477,14 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
             ++result[j];
             --spielraum;
           }
+        }
+      }
+
+      // Entferne verbleibende negative Abstaende zwischen Ziffern durch Kerning
+      for (size_t i = 1; i < result.size() - 1; ++i) {
+        if (result[i] < 0) {
+          spielraum -= -result[i];
+          result[i] = 0;
         }
       }
     }
