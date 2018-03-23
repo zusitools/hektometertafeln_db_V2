@@ -468,7 +468,7 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
       for (int i = 0; i <= 2 * tp.def_ziffernabstand_mm; ++i) {
         // Pruefe Abstand links/rechts nur 1x pro Iteration,
         // da sich der Spielraum pro Iteration um max. 2mm verringert.
-        if (spielraum <= 2 * tp.def_ziffernabstand_mm) {
+        if (spielraum <= 4 * tp.def_ziffernabstand_mm) {
           break;
         }
 
