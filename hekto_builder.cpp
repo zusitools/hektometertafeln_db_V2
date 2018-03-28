@@ -933,8 +933,11 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int zahl_ob
       "</Info>\n"
       "<Landschaft>\n");
 
-  SubsetBuilder subset_unbeleuchtet(0xFFFFFFFF, 0x00000000);
-  SubsetBuilder subset_beleuchtet(0xFF9B9B9B, 0xFF646464);
+  const uint32_t grundfarbe = 0xFFFFFF;
+  const uint32_t nachtfarbe = 0x646464;
+
+  SubsetBuilder subset_unbeleuchtet(grundfarbe | 0xFF000000, 0xFF000000);
+  SubsetBuilder subset_beleuchtet((grundfarbe - nachtfarbe) | 0xFF000000, nachtfarbe | 0xFF000000);
   auto& subset_evtl_beleuchtet = (bauparameter.rueckstrahlend == Rueckstrahlend::kYes ? subset_beleuchtet : subset_unbeleuchtet);
 
   // Die Spiegelung der Vorder- und Rueckseitentextur ist abhaengig vom dargestellten Wert
