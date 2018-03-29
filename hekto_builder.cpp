@@ -1025,10 +1025,11 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int zahl_ob
   }
 
   if (bauparameter.ankerpunkt == Ankerpunkt::kYes) {
-    MakeAnkerpunkt(-x_verschiebung, z_verschiebung, false);
-
     if (bauparameter.beidseitig == Beidseitig::kBeidseitig) {
-      MakeAnkerpunkt(x_verschiebung, z_verschiebung, true);
+      MakeAnkerpunkt(-x_verschiebung - 0.01, z_verschiebung, false);
+      MakeAnkerpunkt(x_verschiebung + 0.01, z_verschiebung, true);
+    } else {
+      MakeAnkerpunkt(-x_verschiebung, z_verschiebung, false);
     }
   }
 
