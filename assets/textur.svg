@@ -28,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.3242188"
-     inkscape:cx="128.00001"
-     inkscape:cy="128"
+     inkscape:zoom="0.82173544"
+     inkscape:cx="-31.064302"
+     inkscape:cy="419.0276"
      inkscape:document-units="px"
      inkscape:current-layer="layer5"
      showgrid="false"
@@ -87,8 +87,8 @@
   </metadata>
   <g
      inkscape:groupmode="layer"
-     id="layer4"
-     inkscape:label="Textur"
+     id="layer2"
+     inkscape:label="HG Normal + Verwittert 1"
      style="display:inline">
     <rect
        style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.02000002;fill:#e3e2da;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:43.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.50970878;marker:none;enable-background:accumulate"
@@ -97,27 +97,28 @@
        height="67.73333"
        x="0"
        y="1.0757007e-07" />
-    <image
-       xlink:href="mast.png"
-       y="3.7270506e-06"
-       x="61.383335"
-       id="image3875"
-       preserveAspectRatio="none"
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="HG Verwittert 2"
+     style="display:none">
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.02000002;fill:#8d7b55;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:43.49999619;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.50970878;marker:none;enable-background:accumulate"
+       id="rect3900-6"
+       width="67.73333"
        height="67.73333"
-       width="6.3500004"
-       style="stroke-width:8.33333302" />
-    <image
-       xlink:href="rueckseite.png"
-       y="0.2645852"
-       x="30.956253"
-       id="image3886"
-       preserveAspectRatio="none"
-       height="33.866665"
-       width="30.427082"
-       style="stroke-width:21.71734619" />
+       x="0"
+       y="-4.9654437e-16" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Ziffern"
+     style="display:inline">
     <path
        d="m 10.066709,36.24792 c 1.010716,0 1.951726,0.36022 2.823029,1.08064 0.773727,0.63756 1.352276,1.50143 1.735644,2.59164 0.32064,0.91808 0.480963,1.94135 0.480963,3.06981 0,1.89352 -0.442621,3.46827 -1.327867,4.72425 -0.411264,0.58654 -0.947986,1.07108 -1.610172,1.45361 -0.669162,0.38253 -1.366206,0.5738 -2.091133,0.5738 -1.0176848,0 -1.9656674,-0.36022 -2.8439393,-1.08065 C 6.4664827,48.02985 5.8914185,47.16597 5.5080407,46.06938 5.187401,45.1513 5.0270833,44.09616 5.0270833,42.90395 c 0,-1.85528 0.4426247,-3.39814 1.3278738,-4.62862 0.4251927,-0.59293 0.9619152,-1.07747 1.610172,-1.45362 0.6412796,-0.36977 1.3418064,-0.56105 2.1015799,-0.57379 z m 0,1.9035 c -0.8503938,0 -1.6877518,0.43035 -2.1896234,1.29103 -0.599456,1.03921 -0.9913123,2.12264 -0.9913123,3.48062 0,1.43447 0.2997258,2.55935 0.8991861,3.60494 0.5018673,0.86706 1.4313558,1.32363 2.2817496,1.32363 0.850398,0 1.756853,-0.45657 2.258721,-1.32363 0.59946,-1.04559 0.922219,-2.15133 0.922219,-3.54756 0,-1.42174 -0.391856,-2.5243 -0.991316,-3.538 -0.501868,-0.84794 -1.339226,-1.27828 -2.189624,-1.29103 z"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:200px;font-family:FuturaTEEMed;-inkscape-font-specification:'FuturaTEEMed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458338px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:200px;font-family:FuturaTEEMed;-inkscape-font-specification:'FuturaTEEMed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458338px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="path5793"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccsccsccscccccscscscc" />
@@ -129,13 +130,13 @@
        sodipodi:nodetypes="ssccssccccccccccss" />
     <path
        id="path2154-6"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04233335;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04233335;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
        d="m 52.7051,40.18142 -3.047948,5.26205 M 52.7051,40.18142 v 5.26205 m 0,-5.26205 v 5.26205 H 49.657152 L 52.7051,40.18142 m 1.953814,-3.9335 H 52.887462 L 46.452898,47.29299 H 52.7051 v 2.44868 h 1.953814 m 0,-4.2982 v -9.19555 m 1.432799,11.04507 V 45.44347 H 54.36221 l -0.266011,1.84952 M 52.7051,49.74167 h 1.953814 M 52.887462,36.24792 h 1.771452"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccccccccccccccccccc" />
     <path
        d="m 28.17893,38.032077 h -4.290432 l -0.384671,2.865079 c 1.353863,-0.0887 2.25417,0.13096 3.141184,0.530961 0.887027,0.400009 1.287827,0.84438 1.731802,1.628619 0.443975,0.784221 0.480264,1.34717 0.480264,2.254531 0,1.490659 -0.448458,2.301359 -1.334872,3.192149 -0.886417,0.89078 -1.942595,1.23825 -3.277706,1.23825 -0.907364,0 -1.651997,-0.24374 -2.326036,-0.63909 -0.667563,-0.40183 -1.240794,-1.10285 -1.765763,-1.96484 l 1.595563,-0.92954 c 0.324055,0.54442 0.454674,0.69148 0.687994,0.91833 0.544417,0.51849 1.205494,0.80077 1.98323,0.80077 0.913836,0 1.452202,-0.19099 2.016437,-0.76383 0.564234,-0.572829 0.697413,-1.143209 0.697413,-1.86911 0,-0.868469 -0.273236,-1.48379 -0.904116,-1.99339 -0.630885,-0.50961 -1.280192,-0.68067 -2.137515,-0.75619 -0.857332,-0.0755 -1.453155,-0.0871 -2.679825,0.21294 l 0.961526,-6.5098 h 5.805523 z"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:200px;font-family:FuturaTEEMed;-inkscape-font-specification:'FuturaTEEMed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;line-height:200px;font-family:FuturaTEEMed;-inkscape-font-specification:'FuturaTEEMed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="path5783"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccczzszsccccszszzcccc" />
@@ -147,7 +148,7 @@
        sodipodi:nodetypes="sccssssssssss" />
     <path
        id="path2180"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04233335;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04233335;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
        d="m 37.594714,54.184927 v -1.79743 m 4.637057,1.79743 -4.142085,11.69632 h 2.058013 m 4.793353,-13.49375 -4.793353,13.49375 m -2.552985,-11.69632 h 4.637057 m -4.637057,-1.79743 h 7.346338 m -2.709281,1.79743 h 2.084064 l -4.168136,11.69632 m 2.084072,-11.69632 -4.142085,11.69632 h 2.058013 m -2.552985,-13.49375 h 7.346338 l -0.625217,1.79743 m -6.721121,-1.79743 v 1.79743 h 6.721121"
        inkscape:connector-curvature="0" />
     <path
@@ -158,7 +159,7 @@
        sodipodi:nodetypes="sscccscssscccszcscz" />
     <path
        id="path2894"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04233332;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04233332;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
        d="M 5.94832,65.88125 V 55.00914 L 3.96875,55.74166 V 53.77542 L 7.85024,52.3875 v 13.49375 z"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccc" />
@@ -168,111 +169,74 @@
        id="path5946-8-5"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="zccszccssccccczzz" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Texturen"
+     style="display:inline">
+    <image
+       xlink:href="mast.png"
+       style="stroke-width:8.33333302"
+       width="6.3500004"
+       height="67.73333"
+       preserveAspectRatio="none"
+       id="image3875"
+       x="61.383335"
+       y="3.7270506e-06" />
+    <image
+       xlink:href="rueckseite.png"
+       style="stroke-width:21.71734619"
+       width="30.427082"
+       height="33.866665"
+       preserveAspectRatio="none"
+       id="image3886"
+       x="30.956253"
+       y="0.2645852" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer10"
+     inkscape:label="VG Normal"
+     style="display:inline">
     <image
        xlink:href="vorderseite.png"
-       y="0.2645852"
-       x="0.26458332"
+       style="display:inline;stroke-width:8.34057713"
+       width="30.427084"
+       height="33.866665"
+       preserveAspectRatio="none"
        id="image3897"
+       x="0.26458332"
+       y="0.2645852" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer11"
+     inkscape:label="VG Verwittert 1"
+     style="display:none">
+    <image
+       xlink:href="vorderseite_verwittert_1.png"
+       y="0.26458597"
+       x="0.26458332"
+       id="image3897-3"
        preserveAspectRatio="none"
        height="33.866665"
        width="30.427084"
-       style="stroke-width:8.34057713" />
+       style="display:inline;stroke-width:8.34057713" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer1"
-     inkscape:label="Tunnel &lt;= 256"
+     inkscape:label="VG Verwittert 2"
      style="display:none">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.25;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.77952719;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="m 1,0 v 129 h 231 v 127 h 24 V 1 Z"
-       transform="scale(0.26458333)"
-       id="rect839"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Tunnel &lt;= 64"
-     style="display:none">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.25;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="M 0.26458333,0 V 34.13125 H 61.383333 v 33.602083 h 6.35 V 0.26458333 Z"
-       id="rect839-6"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer3"
-     inkscape:label="Tunnel &lt;= 32"
-     style="display:none">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.25;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="M 0.26458333,0 V 34.13125 H 61.383333 v 33.602083 h 6.35 V 0.26458333 Z"
-       id="rect839-7"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer5"
-     inkscape:label="Tunnel &lt;= 16"
-     style="display:none">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.25;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="M 0.26458333,0 V 34.13125 H 61.383333 v 33.602083 h 6.35 V 0.26458333 Z"
-       id="rect839-5"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer6"
-     inkscape:label="Tunnel &lt;= 8"
-     style="display:none">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.25;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="M 0.26458333,0 V 34.13125 H 61.383333 v 33.602083 h 6.35 V 0.26458333 Z"
-       id="rect839-3"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer7"
-     inkscape:label="Tunnel &lt;= 4"
-     style="display:none">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.25;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="M 0.26458333,0 V 34.13125 H 61.383333 v 33.602083 h 6.35 V 0.26458333 Z"
-       id="rect839-56"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer8"
-     inkscape:label="Tunnel &lt;= 2"
-     style="display:none">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.25;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="M 0.26458333,0 V 34.13125 H 61.383333 v 33.602083 h 6.35 V 0.26458333 Z"
-       id="rect839-2"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer9"
-     inkscape:label="Tunnel &lt;= 1"
-     style="display:none">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.25;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="M 0.26458333,0 V 34.13125 H 61.383333 v 33.602083 h 6.35 V 0.26458333 Z"
-       id="rect839-9"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
+    <image
+       xlink:href="vorderseite_verwittert_2.png"
+       style="display:inline;stroke-width:8.34057713"
+       width="30.427084"
+       height="33.866665"
+       preserveAspectRatio="none"
+       id="image3897-3-3"
+       x="0.26458332"
+       y="0.26458597" />
   </g>
 </svg>
