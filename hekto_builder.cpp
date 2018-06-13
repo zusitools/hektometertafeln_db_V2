@@ -7,9 +7,10 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
-#include <iterator>
 #include <functional>
+#include <iterator>
 #include <utility>
 
 
@@ -27,6 +28,8 @@ struct TafelParameter final {
   int ziffernhoehe_mm;
   int def_ziffernabstand_mm;
   int max_ziffernabstand_mm;
+
+  int zifferndicke_mm;
 
   const Textur& tex_tafel_vorderseite;
   const Textur& tex_tafel_rueckseite;
@@ -622,7 +625,7 @@ std::pair<std::vector<T>, std::vector<T>> GetStuetzpunkte(
 
 }  // namespace
 
-Ziffern ZiffernBuilder::Build(const TafelParameter& tp, int zahl_oben, int ziffer_unten) {
+Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten) {
   assert(zahl_oben >= 0);
   assert(zahl_oben <= 999);
   assert(ziffer_unten >= 0);
@@ -728,7 +731,29 @@ Ziffern ZiffernBuilder::Build(const TafelParameter& tp, int zahl_oben, int ziffe
       kYTafelMitte_mm, kYTafelMitte_mm - tp.ziffernhoehe_mm - 2 * kYAbstandZiffern_mm,
       kYAbstandZiffern_mm, kYAbstandZiffern_mm, false);
 
-  return { result, stuetzpunkte_oben, stuetzpunkte_unten };
+  Mesh minuszeichen_mesh;
+  if (ist_negativ) {
+    const auto y = ((tp.YOben() - kEckenRadius_mm) + kYTafelMitte_mm) / 2;
+    const auto y_oben = y + (tp.zifferndicke_mm / 2);
+    const auto y_unten = y_oben - tp.zifferndicke_mm;
+
+    const auto breite_regulaer = 2.2 * tp.zifferndicke_mm;
+    const auto breite_min = 1.0 * tp.zifferndicke_mm;
+    const auto abstand_x = 0.5 * tp.zifferndicke_mm;  // Abstand von Tafelrand und von Ziffern
+
+    const auto x_rechts_regulaer = tp.XLinks() + abstaende_oben.front() - abstand_x;
+    const auto x_links = std::max(x_rechts_regulaer - breite_regulaer, tp.XLinks() + abstand_x);
+    const auto x_rechts = std::max(x_rechts_regulaer, x_links + breite_min);
+
+    const auto v1 = minuszeichen_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0, y_unten / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    const auto v2 = minuszeichen_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0, y_unten / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    const auto v3 = minuszeichen_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0,  y_oben / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    const auto v4 = minuszeichen_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0,  y_oben / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    minuszeichen_mesh.faces.emplace_back(v1, v2, v3);
+    minuszeichen_mesh.faces.emplace_back(v3, v4, v1);
+  }
+
+  return { result, minuszeichen_mesh, stuetzpunkte_oben, stuetzpunkte_unten };
 }
 
 
@@ -918,7 +943,11 @@ static constexpr float kZVerschiebungHoch = 2.4f;
 
 }  // namespace
 
-void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int zahl_oben, int ziffer_unten) {
+void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int hektometer) {
+  const bool ist_negativ = hektometer < 0;
+  const int zahl_oben = std::abs(hektometer) / 10;
+  const int ziffer_unten = std::abs(hektometer) % 10;
+
   assert(zahl_oben >= 0);
   assert(zahl_oben <= 999);
   assert(ziffer_unten >= 0);
@@ -945,14 +974,17 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int zahl_ob
 
   const float mm_per_px = bauparameter.groesse == Groesse::kKlein ? 210.0f / 51.0f : 310.0f / 51.0f;
 
+  const bool breit = (ist_negativ && (zahl_oben >= 10)) || (zahl_oben >= 100);  // TODO auch bei Ueberlaenge
+
   TafelParameter tp = bauparameter.groesse == Groesse::kKlein ?
     TafelParameter {
-      /* breite */ zahl_oben < 100 ? 320 : 480,
+      /* breite */ breit ? 480 : 320,
       /* hoehe */ 610,
 
       /* ziffernhoehe_mm */ 210,
       /* def_ziffernabstand_mm */ static_cast<int>(16 - 2 * kAbstandXKlein_mm),
       /* max_ziffernabstand_mm */ static_cast<int>(15/*px*/ * mm_per_px - 2 * kAbstandXKlein_mm),
+      /* zifferndicke_mm */ 27,
 
       /* tex_tafel_vorderseite */ rand() % 2 == 0 ? kTafelVorderseiteTexturKlein : kTafelVorderseiteTexturKleinGespiegelt,
       /* tex_tafel_rueckseite */ rand() % 2 == 0 ? kTafelRueckseiteTexturKlein : kTafelRueckseiteTexturKleinGespiegelt,
@@ -960,12 +992,13 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int zahl_ob
       /* tex_mast */ kMastTextur,
       /* tex_transparent */ kTransparentTextur
     } : TafelParameter {
-      /* breite */ zahl_oben < 100 ? 480 : 720,
+      /* breite */ breit ? 720 : 480,
       /* hoehe */ 800,
 
       /* ziffernhoehe_mm */ 310,
       /* def_ziffernabstand_mm */ static_cast<int>(24 - 2 * kAbstandXGross_mm),
       /* max_ziffernabstand_mm */ static_cast<int>(15/*px*/ * mm_per_px - 2 * kAbstandXGross_mm),
+      /* zifferndicke_mm */ 40,
 
       /* tex_tafel_vorderseite */ rand() % 2 == 0 ? kTafelVorderseiteTexturGross : kTafelVorderseiteTexturGrossGespiegelt,
       /* tex_tafel_rueckseite */ rand() % 2 == 0 ? kTafelRueckseiteTexturGross : kTafelRueckseiteTexturGrossGespiegelt,
@@ -1002,15 +1035,17 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int zahl_ob
   // Verschiebe sie so, dass die Oberkante bei z=0 liegt
   const float z_verschiebung_tafel = z_verschiebung + (bauparameter.groesse == Groesse::kKlein ? -.61 / 2 : -.80 / 2);
 
-  const auto& ziffern = ZiffernBuilder::Build(tp, zahl_oben, ziffer_unten);
+  const auto& ziffern = ZiffernBuilder::Build(tp, ist_negativ, zahl_oben, ziffer_unten);
   const auto& mesh_vorderseite = TafelVorderseiteBuilder::Build(tp, ziffern.stuetzpunkte_oben, ziffern.stuetzpunkte_unten);
   const auto& mesh_rueckseite = TafelRueckseiteBuilder::Build(tp);
 
-  subset_evtl_beleuchtet.AddMesh(MeshOps::translate(-x_verschiebung, 0, z_verschiebung_tafel, ziffern.mesh));
+  subset_evtl_beleuchtet.AddMesh(MeshOps::translate(-x_verschiebung, 0, z_verschiebung_tafel, ziffern.mesh1));
+  subset_evtl_beleuchtet.AddMesh(MeshOps::translate(-x_verschiebung, 0, z_verschiebung_tafel, ziffern.mesh2)); // TODO: sep. Subset
   subset_evtl_beleuchtet.AddMesh(MeshOps::translate(-x_verschiebung, 0, z_verschiebung_tafel, mesh_vorderseite));
 
   if (bauparameter.beidseitig == Beidseitig::kBeidseitig) {
-    subset_evtl_beleuchtet.AddMesh(MeshOps::translate(x_verschiebung, 0, z_verschiebung_tafel, MeshOps::rotateZ180(ziffern.mesh)));
+    subset_evtl_beleuchtet.AddMesh(MeshOps::translate(x_verschiebung, 0, z_verschiebung_tafel, MeshOps::rotateZ180(ziffern.mesh1)));
+    subset_evtl_beleuchtet.AddMesh(MeshOps::translate(x_verschiebung, 0, z_verschiebung_tafel, MeshOps::rotateZ180(ziffern.mesh2))); // TODO: sep. Subset
     subset_evtl_beleuchtet.AddMesh(MeshOps::translate(x_verschiebung, 0, z_verschiebung_tafel, MeshOps::rotateZ180(mesh_vorderseite)));
   }
 

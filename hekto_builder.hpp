@@ -28,7 +28,8 @@ struct BauParameter final {
 struct TafelParameter;
 
 struct Ziffern final {
-  Mesh mesh;
+  Mesh mesh1;
+  Mesh mesh2;
   std::vector<int> stuetzpunkte_oben;
   std::vector<int> stuetzpunkte_unten;
 };
@@ -56,7 +57,7 @@ class TafelVorderseiteBuilder final {
 
 class ZiffernBuilder final {
  public:
-  static Ziffern Build(const TafelParameter& tp, int zahl_oben, int ziffer_unten);
+  static Ziffern Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten);
 };
 
 class MastBuilder final {
@@ -66,7 +67,7 @@ class MastBuilder final {
 
 class HektoBuilder final {
  public:
-  static void Build(FILE* fd, const BauParameter& bauparameter, int zahl_oben, int ziffer_unten);
+  static void Build(FILE* fd, const BauParameter& bauparameter, int hektometer);
 };
 
 #endif  // HEKTO_BUILDER_HPP_
