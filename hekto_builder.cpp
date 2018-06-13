@@ -286,7 +286,7 @@ namespace {
 
 Mesh TafelVorderseiteBuilder::Build(const TafelParameter& tp, const std::vector<int>& stuetzpunkte_oben, const std::vector<int>& stuetzpunkte_unten) {
   assert(stuetzpunkte_oben.size() >= 2);
-  assert(stuetzpunkte_unten.size() == 2);
+  assert(stuetzpunkte_unten.size() >= 2);
 
   Mesh result;
 
@@ -323,11 +323,17 @@ Mesh TafelVorderseiteBuilder::Build(const TafelParameter& tp, const std::vector<
   auto zahl_unten_ru = MakeVertex(stuetzpunkte_unten.back(), kYTafelMitte_mm - tp.ziffernhoehe_mm - 2 * kYAbstandZiffern_mm);
   auto zahl_unten_lu = MakeVertex(stuetzpunkte_unten.front(), kYTafelMitte_mm - tp.ziffernhoehe_mm - 2 * kYAbstandZiffern_mm);
 
-  // Fuellung unten
-  result.faces.emplace_back(ecken.v_ru_oben, ecken.v_ru_unten, zahl_unten_ru);
-  result.faces.emplace_back(ecken.v_ru_unten, ecken.v_lu_unten, zahl_unten_ru);
-  result.faces.emplace_back(ecken.v_lu_unten, zahl_unten_lu, zahl_unten_ru);
+  // Fuellung links unten
   result.faces.emplace_back(ecken.v_lu_unten, ecken.v_lu_oben, zahl_unten_lu);
+
+  // Fuellung unten
+  MakeQuad(&result, ecken.v_ru_unten, ecken.v_lu_unten, zahl_unten_lu,
+      std::upper_bound(std::cbegin(stuetzpunkte_unten), std::cend(stuetzpunkte_unten), stuetzpunkte_unten.front()),
+      std::lower_bound(std::cbegin(stuetzpunkte_unten), std::cend(stuetzpunkte_unten), stuetzpunkte_unten.back()),
+      zahl_unten_ru);
+
+  // Fuellung rechts unten
+  result.faces.emplace_back(ecken.v_ru_oben, ecken.v_ru_unten, zahl_unten_ru);
 
   auto zahl_unten_lo = MakeVertex(stuetzpunkte_unten.front(), kYTafelMitte_mm);
   auto zahl_oben_lu = MakeVertex(stuetzpunkte_oben.front(), kYTafelMitte_mm);
@@ -430,7 +436,7 @@ std::vector<int> GetDefaultAbstaende(const TafelParameter& tp, const std::vector
 
 // Berechnet Ziffernabstaende so, dass die Ziffern in die angegebene Gesamtbreite passen
 // und alle Abstaende >= 0 sind.
-std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& ziffern, const std::array<Textur, 10>& ziffern_texturen, int gesamtbreite_mm) {
+std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& ziffern, const std::array<Textur, 10>& ziffern_texturen, int gesamtbreite_mm, bool unten) {
   auto result = GetDefaultAbstaende(tp, ziffern);
   // result kann an dieser Stelle noch negative Werte enthalten,
   // die durch spaeteres Erhoehen der Ziffernabstaende ausgeglichen werden koennen.
@@ -463,7 +469,12 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
       ++j;
     }
   } else if (spielraum > 0) {
-    if (ziffern.size() > 1) {
+    if (unten && (ziffern.size() > 1)) {
+      // Ueberlaenge: Lasse Platz zwischen der ersten Ziffer und den restlichen Ziffern
+      const auto abstand = std::min(spielraum, tp.max_ziffernabstand_mm - result[1]);
+      result[1] += abstand;
+      spielraum -= abstand;
+    } else if (ziffern.size() > 1) {
       // Falls links und rechts sehr viel Platz ist:
       // Fuege gleichmaessig mehr Abstand zwischen den Ziffern ein, aber:
       //  - beschraenke den Gesamtabstand auf den dreifachen Default-Abstand (+/- Kerning)
@@ -502,9 +513,11 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
   }
 
   assert(spielraum == 0);
-  for (size_t i = 1; i < result.size() - 1; ++i) {
+  for (size_t i = 0; i < result.size(); ++i) {
     assert(result[i] >= 0);
-    assert(result[i] <= tp.max_ziffernabstand_mm);
+    if ((i != 0) && (i != result.size() - 1)) {
+      assert(result[i] <= tp.max_ziffernabstand_mm);
+    }
   }
   return result;
 }
@@ -516,6 +529,7 @@ using Intervall = std::pair<T, T>;
 // die Intervalle, in denen die Vertices fuer die gegebenen Ziffern mit den gegebenen Abstaenden
 // liegen koennen.
 std::vector<Intervall<int>> GetStuetzpunktIntervalle(const TafelParameter& tp, const std::vector<int>& ziffern, const std::vector<int>& abstaende) {
+  assert(abstaende.size() == ziffern.size() + 1);
   std::vector<Intervall<int>> result;
 
   // Linken Stuetzpunkt, wenn moeglich, mit der linken Tafelseite zusammenfallen lassen
@@ -540,10 +554,11 @@ std::vector<Intervall<int>> GetStuetzpunktIntervalle(const TafelParameter& tp, c
     result.emplace_back(offset, offset + tp.max_ziffernabstand_mm);
   }
 
+  assert(result.size() == ziffern.size() + 1);
   return result;
 }
 
-// Berechnet aus den zwei angegebenen Listen von abgeschlossenen Intervallen
+// Berechnet aus den zwei angegebenen sortierten Listen von abgeschlossenen Intervallen
 // (die Intervalle in jeder Liste sind paarweise disjunkt)
 // zwei Listen von Werten, sodass jeder Wert im zugehoerigen Intervall
 // der Ursprungsliste liegt und zusaetzlich moeglichst viele Werte
@@ -625,23 +640,30 @@ std::pair<std::vector<T>, std::vector<T>> GetStuetzpunkte(
 
 }  // namespace
 
-Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten) {
+Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten, int ueberlaenge) {
   assert(zahl_oben >= 0);
   assert(zahl_oben <= 999);
   assert(ziffer_unten >= 0);
   assert(ziffer_unten <= 9);
+  assert(ueberlaenge >= 0);
+  assert(ueberlaenge <= 99);
 
   const auto& ziffern_oben = GetZiffern(zahl_oben);
   assert(ziffern_oben.size() >= 1);
   assert(ziffern_oben.size() <= 3);
 
-  const std::vector<int> ziffern_unten = { ziffer_unten };
-  assert(ziffern_unten.size() == 1);
+  std::vector<int> ziffern_unten = { ziffer_unten };
+  if (ueberlaenge > 0) {
+    const auto& ziffern_ueberlaenge = GetZiffern(ueberlaenge);
+    ziffern_unten.insert(std::end(ziffern_unten), std::cbegin(ziffern_ueberlaenge), std::cend(ziffern_ueberlaenge));
+  }
+  assert(ziffern_unten.size() >= 1);
+  assert(ziffern_unten.size() <= 3);
 
   // Ziffernabstaende berechnen
-  const auto& abstaende_oben = GetAbstaende(tp, ziffern_oben, tp.tex_ziffern, tp.breite_mm);
+  const auto abstaende_oben = GetAbstaende(tp, ziffern_oben, tp.tex_ziffern, tp.breite_mm, false);
   assert(abstaende_oben.size() == ziffern_oben.size() + 1);
-  const auto& abstaende_unten = GetAbstaende(tp, ziffern_unten, tp.tex_ziffern, tp.breite_mm);
+  const auto abstaende_unten = GetAbstaende(tp, ziffern_unten, tp.tex_ziffern, tp.breite_mm, true);
   assert(abstaende_unten.size() == ziffern_unten.size() + 1);
 
   // Stuetzpunkt-Intervalle berechnen
@@ -943,7 +965,7 @@ static constexpr float kZVerschiebungHoch = 2.4f;
 
 }  // namespace
 
-void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int hektometer) {
+void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int hektometer, int ueberlaenge_hm) {
   const bool ist_negativ = hektometer < 0;
   const int zahl_oben = std::abs(hektometer) / 10;
   const int ziffer_unten = std::abs(hektometer) % 10;
@@ -952,6 +974,7 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int hektome
   assert(zahl_oben <= 999);
   assert(ziffer_unten >= 0);
   assert(ziffer_unten <= 9);
+  assert(ueberlaenge_hm >= 0);
 
   fprintf(fd,
       "\xef\xbb\xbf"
@@ -974,7 +997,7 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int hektome
 
   const float mm_per_px = bauparameter.groesse == Groesse::kKlein ? 210.0f / 51.0f : 310.0f / 51.0f;
 
-  const bool breit = (ist_negativ && (zahl_oben >= 10)) || (zahl_oben >= 100);  // TODO auch bei Ueberlaenge
+  const bool breit = (ist_negativ && (zahl_oben >= 10)) || (zahl_oben >= 100) || (ueberlaenge_hm > 0);
 
   TafelParameter tp = bauparameter.groesse == Groesse::kKlein ?
     TafelParameter {
@@ -1035,7 +1058,7 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int hektome
   // Verschiebe sie so, dass die Oberkante bei z=0 liegt
   const float z_verschiebung_tafel = z_verschiebung + (bauparameter.groesse == Groesse::kKlein ? -.61 / 2 : -.80 / 2);
 
-  const auto& ziffern = ZiffernBuilder::Build(tp, ist_negativ, zahl_oben, ziffer_unten);
+  const auto& ziffern = ZiffernBuilder::Build(tp, ist_negativ, zahl_oben, ziffer_unten, ueberlaenge_hm);
   const auto& mesh_vorderseite = TafelVorderseiteBuilder::Build(tp, ziffern.stuetzpunkte_oben, ziffern.stuetzpunkte_unten);
   const auto& mesh_rueckseite = TafelRueckseiteBuilder::Build(tp);
 

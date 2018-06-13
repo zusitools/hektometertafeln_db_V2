@@ -57,7 +57,7 @@ class TafelVorderseiteBuilder final {
 
 class ZiffernBuilder final {
  public:
-  static Ziffern Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten);
+  static Ziffern Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten, int ueberlaenge);
 };
 
 class MastBuilder final {
@@ -67,7 +67,7 @@ class MastBuilder final {
 
 class HektoBuilder final {
  public:
-  static void Build(FILE* fd, const BauParameter& bauparameter, int hektometer);
+  static void Build(FILE* fd, const BauParameter& bauparameter, int hektometer, int ueberlaenge_hm);
 };
 
 #endif  // HEKTO_BUILDER_HPP_
