@@ -753,7 +753,7 @@ Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int za
       kYTafelMitte_mm, kYTafelMitte_mm - tp.ziffernhoehe_mm - 2 * kYAbstandZiffern_mm,
       kYAbstandZiffern_mm, kYAbstandZiffern_mm, false);
 
-  Mesh minuszeichen_mesh;
+  Mesh plusminus_mesh;
   if (ist_negativ) {
     const auto y = ((tp.YOben() - kEckenRadius_mm) + kYTafelMitte_mm) / 2;
     const auto y_oben = y + (tp.zifferndicke_mm / 2);
@@ -767,15 +767,62 @@ Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int za
     const auto x_links = std::max(x_rechts_regulaer - breite_regulaer, tp.XLinks() + abstand_x);
     const auto x_rechts = std::max(x_rechts_regulaer, x_links + breite_min);
 
-    const auto v1 = minuszeichen_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0, y_unten / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
-    const auto v2 = minuszeichen_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0, y_unten / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
-    const auto v3 = minuszeichen_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0,  y_oben / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
-    const auto v4 = minuszeichen_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0,  y_oben / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
-    minuszeichen_mesh.faces.emplace_back(v1, v2, v3);
-    minuszeichen_mesh.faces.emplace_back(v3, v4, v1);
+    const auto v1 = plusminus_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0, y_unten / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    const auto v2 = plusminus_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0, y_unten / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    const auto v3 = plusminus_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0,  y_oben / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    const auto v4 = plusminus_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0,  y_oben / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    plusminus_mesh.faces.emplace_back(v1, v2, v3);
+    plusminus_mesh.faces.emplace_back(v3, v4, v1);
   }
 
-  return { result, minuszeichen_mesh, stuetzpunkte_oben, stuetzpunkte_unten };
+  if (ueberlaenge > 0) {
+    assert(abstaende_unten.size() >= 2);
+    assert(ziffern_unten.size() >= 1);
+
+    const auto x = tp.XLinks() + abstaende_unten[0] + tp.tex_ziffern[ziffern_unten[0]].breite_mm + abstaende_unten[1] / 2;
+    const auto y = ((tp.YUnten() + kEckenRadius_mm) + kYTafelMitte_mm) / 2;
+
+    const auto xs = std::vector<int> {
+      x - tp.zifferndicke_mm / 2 - tp.zifferndicke_mm,
+      x - tp.zifferndicke_mm / 2,
+      x + tp.zifferndicke_mm / 2,
+      x + tp.zifferndicke_mm / 2 + tp.zifferndicke_mm,
+    };
+    const auto ys = std::vector<int> {
+      y + tp.zifferndicke_mm / 2 + tp.zifferndicke_mm,
+      y + tp.zifferndicke_mm / 2,
+      y - tp.zifferndicke_mm / 2,
+      y - tp.zifferndicke_mm / 2 - tp.zifferndicke_mm,
+    };
+
+    const auto verts = std::vector {
+      plusminus_mesh.EmplaceVertex(-0.01,       -xs[2] / 1000.0, ys[3] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01,       -xs[1] / 1000.0, ys[3] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01,       -xs[1] / 1000.0, ys[0] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01,       -xs[2] / 1000.0, ys[0] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+
+      plusminus_mesh.EmplaceVertex(-0.01, -(xs[1] + 1) / 1000.0, ys[2] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01,       -xs[0] / 1000.0, ys[2] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01,       -xs[0] / 1000.0, ys[1] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01, -(xs[1] + 1) / 1000.0, ys[1] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+
+      plusminus_mesh.EmplaceVertex(-0.01,       -xs[3] / 1000.0, ys[2] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01, -(xs[2] - 1) / 1000.0, ys[2] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01, -(xs[2] - 1) / 1000.0, ys[1] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+      plusminus_mesh.EmplaceVertex(-0.01,       -xs[3] / 1000.0, ys[1] / 1000.0, -1, 0, 0, .103, .915, .103, .915),
+    };
+
+    plusminus_mesh.faces.emplace_back(verts[0], verts[1], verts[2]);
+    plusminus_mesh.faces.emplace_back(verts[2], verts[3], verts[0]);
+
+    plusminus_mesh.faces.emplace_back(verts[4], verts[5], verts[6]);
+    plusminus_mesh.faces.emplace_back(verts[6], verts[7], verts[4]);
+
+    plusminus_mesh.faces.emplace_back(verts[8], verts[9], verts[10]);
+    plusminus_mesh.faces.emplace_back(verts[10], verts[11], verts[8]);
+  }
+
+  return { result, plusminus_mesh, stuetzpunkte_oben, stuetzpunkte_unten };
 }
 
 
