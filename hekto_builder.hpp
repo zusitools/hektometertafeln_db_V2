@@ -7,6 +7,7 @@
 
 #include <cstdio>
 #include <cstdint>
+#include <cmath>
 #include <vector>
 
 enum class Hoehe { kHoch, kNiedrig };
@@ -26,6 +27,33 @@ struct BauParameter final {
 };
 
 struct TafelParameter;
+
+struct Kilometrierung {
+  // Invariante: -oo < km < oo
+  // Invariante: 0 <= |hm| <= 9
+  // Invariante: km < 0 ==> hm < 0
+  // Invariante: km > 0 ==> hm > 0
+  const int km;
+  const int hm;
+
+  static Kilometrierung fromMeter(int wert_m) {
+    // Runde auf Hektometer
+    int wert_m_int = std::abs(wert_m) + 50;
+    int vorzeichen = (wert_m < 0 ? -1 : 1);
+    return {
+      vorzeichen * (wert_m_int / 1000),
+      vorzeichen * ((wert_m_int % 1000) / 100)
+    };
+  }
+
+  int toHektometer() const {
+    return 10 * km + hm;
+  }
+
+  bool istNegativ() const {
+    return hm < 0;
+  }
+};
 
 struct Ziffern final {
   Mesh mesh1;
@@ -67,7 +95,7 @@ class MastBuilder final {
 
 class HektoBuilder final {
  public:
-  static void Build(FILE* fd, const BauParameter& bauparameter, int hektometer, int ueberlaenge_hm);
+  static void Build(FILE* fd, const BauParameter& bauparameter, Kilometrierung kilometrierung, int ueberlaenge_hm);
 };
 
 #endif  // HEKTO_BUILDER_HPP_

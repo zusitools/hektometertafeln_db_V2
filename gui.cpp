@@ -5,6 +5,8 @@
 #include "config.hpp"
 #include "resource.hpp"
 
+#include <cassert>
+#include <string>
 #include <windows.h>
 
 static const char* kPropBauparameter = "__HEKTO_BAUPARAMETER";
@@ -21,6 +23,14 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
       CheckDlgButton(hwnd, IDC_RUECKSTRAHLEND, config->rueckstrahlend == Rueckstrahlend::kYes);
       CheckDlgButton(hwnd, IDC_ANKERPUNKT, config->ankerpunkt == Ankerpunkt::kYes);
       CheckDlgButton(hwnd, IDC_IMMER_OHNE_MAST, config->immer_ohne_mast);
+      CheckDlgButton(hwnd, IDC_HAT_UEBERLAENGE, config->hat_ueberlaenge);
+
+      const auto handle_basis_km = GetDlgItem(hwnd, IDC_BASIS_KM);
+      SendMessage(handle_basis_km, WM_SETTEXT, 0, (LPARAM)(std::to_string(config->basis_km).c_str()));
+
+      const auto handle_basis_hm = GetDlgItem(hwnd, IDC_BASIS_HM);
+      SendMessage(handle_basis_hm, WM_SETTEXT, 0, (LPARAM)(std::to_string(config->basis_hm).c_str()));
+
       return TRUE;
     }
 
@@ -28,25 +38,23 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
       auto* config = static_cast<HektoDllConfig*>(GetProp(hwnd, kPropBauparameter));
       switch (LOWORD(wParam)) {
         case IDOK:
+          config->beidseitig = IsDlgButtonChecked(hwnd, IDC_BEIDSEITIG) ? Beidseitig::kBeidseitig : Beidseitig::kEinseitig;
+          config->groesse = IsDlgButtonChecked(hwnd, IDC_KLEIN) ? Groesse::kKlein : Groesse::kGross;
+          config->rueckstrahlend = IsDlgButtonChecked(hwnd, IDC_RUECKSTRAHLEND) ? Rueckstrahlend::kYes : Rueckstrahlend::kNo;
+          config->ankerpunkt = IsDlgButtonChecked(hwnd, IDC_ANKERPUNKT) ? Ankerpunkt::kYes : Ankerpunkt::kNo;
+          config->immer_ohne_mast = IsDlgButtonChecked(hwnd, IDC_IMMER_OHNE_MAST);
+          config->hat_ueberlaenge = IsDlgButtonChecked(hwnd, IDC_HAT_UEBERLAENGE);
+
+          char buf[64];
+          GetDlgItemText(hwnd, IDC_BASIS_KM, buf, sizeof(buf)/sizeof(buf[0]));
+          config->basis_km = atoi(buf);
+          GetDlgItemText(hwnd, IDC_BASIS_HM, buf, sizeof(buf)/sizeof(buf[0]));
+          config->basis_hm = atoi(buf);
+
           EndDialog(hwnd, IDOK);
           break;
         case IDCANCEL:
           EndDialog(hwnd, IDCANCEL);
-          break;
-        case IDC_BEIDSEITIG:
-          config->beidseitig = IsDlgButtonChecked(hwnd, IDC_BEIDSEITIG) ? Beidseitig::kBeidseitig : Beidseitig::kEinseitig;
-          break;
-        case IDC_KLEIN:
-          config->groesse = IsDlgButtonChecked(hwnd, IDC_KLEIN) ? Groesse::kKlein : Groesse::kGross;
-          break;
-        case IDC_RUECKSTRAHLEND:
-          config->rueckstrahlend = IsDlgButtonChecked(hwnd, IDC_RUECKSTRAHLEND) ? Rueckstrahlend::kYes : Rueckstrahlend::kNo;
-          break;
-        case IDC_ANKERPUNKT:
-          config->ankerpunkt = IsDlgButtonChecked(hwnd, IDC_ANKERPUNKT) ? Ankerpunkt::kYes : Ankerpunkt::kNo;
-          break;
-        case IDC_IMMER_OHNE_MAST:
-          config->immer_ohne_mast = IsDlgButtonChecked(hwnd, IDC_IMMER_OHNE_MAST);
           break;
       }
       break;

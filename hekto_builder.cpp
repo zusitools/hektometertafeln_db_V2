@@ -1012,10 +1012,10 @@ static constexpr float kZVerschiebungHoch = 2.4f;
 
 }  // namespace
 
-void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, int hektometer, int ueberlaenge_hm) {
-  const bool ist_negativ = hektometer < 0;
-  const int zahl_oben = std::abs(hektometer) / 10;
-  const int ziffer_unten = std::abs(hektometer) % 10;
+void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, Kilometrierung kilometrierung, int ueberlaenge_hm) {
+  const bool ist_negativ = kilometrierung.istNegativ();
+  const int zahl_oben = std::abs(kilometrierung.km);
+  const int ziffer_unten = std::abs(kilometrierung.hm);
 
   assert(zahl_oben >= 0);
   assert(zahl_oben <= 999);
