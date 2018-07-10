@@ -776,10 +776,10 @@ Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int za
     const auto x_links = std::max(x_rechts_regulaer - breite_regulaer, tp.XLinks() + abstand_x);
     const auto x_rechts = std::max(x_rechts_regulaer, x_links + breite_min);
 
-    const auto v1 = plusminus_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0, y_unten / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
-    const auto v2 = plusminus_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0, y_unten / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
-    const auto v3 = plusminus_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0,  y_oben / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
-    const auto v4 = plusminus_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0,  y_oben / 1000.0, -1, 0, 0, 0.103, 0.915, 0, 0);
+    const auto v1 = plusminus_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0, y_unten / 1000.0, -1, 0, 0, .103, .915, .103, .915);
+    const auto v2 = plusminus_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0, y_unten / 1000.0, -1, 0, 0, .103, .915, .103, .915);
+    const auto v3 = plusminus_mesh.EmplaceVertex(-0.01,  -x_links / 1000.0,  y_oben / 1000.0, -1, 0, 0, .103, .915, .103, .915);
+    const auto v4 = plusminus_mesh.EmplaceVertex(-0.01, -x_rechts / 1000.0,  y_oben / 1000.0, -1, 0, 0, .103, .915, .103, .915);
     plusminus_mesh.faces.emplace_back(v1, v2, v3);
     plusminus_mesh.faces.emplace_back(v3, v4, v1);
   }
