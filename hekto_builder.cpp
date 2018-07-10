@@ -33,7 +33,7 @@ struct TafelParameter final {
 
   const Textur& tex_tafel_vorderseite;
   const Textur& tex_tafel_rueckseite;
-  const std::array<Textur, 10>& tex_ziffern;
+  const std::array<Textur, 11>& tex_ziffern;
   const Textur& tex_mast;
   const Textur& tex_transparent;
 
@@ -436,7 +436,7 @@ std::vector<int> GetDefaultAbstaende(const TafelParameter& tp, const std::vector
 
 // Berechnet Ziffernabstaende so, dass die Ziffern in die angegebene Gesamtbreite passen
 // und alle Abstaende >= 0 sind.
-std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& ziffern, const std::array<Textur, 10>& ziffern_texturen, int gesamtbreite_mm, bool unten) {
+std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& ziffern, const std::array<Textur, 11>& ziffern_texturen, int gesamtbreite_mm, bool unten) {
   auto result = GetDefaultAbstaende(tp, ziffern);
   // result kann an dieser Stelle noch negative Werte enthalten,
   // die durch spaeteres Erhoehen der Ziffernabstaende ausgeglichen werden koennen.
@@ -471,7 +471,7 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
   } else if (spielraum > 0) {
     if (unten && (ziffern.size() > 1)) {
       // Ueberlaenge: Lasse Platz zwischen der ersten Ziffer und den restlichen Ziffern
-      const auto abstand = std::min(spielraum, tp.max_ziffernabstand_mm - result[1]);
+      const auto abstand = std::min(spielraum, 2 * tp.max_ziffernabstand_mm - result[1]);
       result[1] += abstand;
       spielraum -= abstand;
     } else if (ziffern.size() > 1) {
@@ -515,7 +515,7 @@ std::vector<int> GetAbstaende(const TafelParameter& tp, const std::vector<int>& 
   assert(spielraum == 0);
   for (size_t i = 0; i < result.size(); ++i) {
     assert(result[i] >= 0);
-    if ((i != 0) && (i != result.size() - 1)) {
+    if ((i != 0) && (i != result.size() - 1) && ((unten == false) || (i != 1))) {
       assert(result[i] <= tp.max_ziffernabstand_mm);
     }
   }
@@ -526,8 +526,8 @@ template <typename T>
 using Intervall = std::pair<T, T>;
 
 // Berechnet unter Beruecksichtigung des maximalen Ziffernabstandes aus `tp`
-// die Intervalle, in denen die Vertices fuer die gegebenen Ziffern mit den gegebenen Abstaenden
-// liegen koennen.
+// die Intervalle, in denen die X-Koordinaten der Vertices fuer die
+// gegebenen Ziffern mit den gegebenen Abstaenden liegen koennen.
 std::vector<Intervall<int>> GetStuetzpunktIntervalle(const TafelParameter& tp, const std::vector<int>& ziffern, const std::vector<int>& abstaende) {
   assert(abstaende.size() == ziffern.size() + 1);
   std::vector<Intervall<int>> result;
@@ -542,8 +542,9 @@ std::vector<Intervall<int>> GetStuetzpunktIntervalle(const TafelParameter& tp, c
 
   for (size_t i = 0; i < ziffern.size() - 1; ++i) {
     offset += tp.tex_ziffern[ziffern[i]].breite_mm;
-    result.emplace_back(offset, offset + abstaende[i+1]);
+    result.emplace_back(offset, offset + std::min(abstaende[i+1], tp.max_ziffernabstand_mm));
     offset += abstaende[i+1];
+    result.emplace_back(offset - std::min(abstaende[i+1], tp.max_ziffernabstand_mm), offset);
   }
 
   // Rechten Stuetzpunkt, wenn moeglich, mit der rechten Tafelseite zusammenfallen lassen
@@ -554,15 +555,15 @@ std::vector<Intervall<int>> GetStuetzpunktIntervalle(const TafelParameter& tp, c
     result.emplace_back(offset, offset + tp.max_ziffernabstand_mm);
   }
 
-  assert(result.size() == ziffern.size() + 1);
+  assert(result.size() == 2 * ziffern.size());
   return result;
 }
 
 // Berechnet aus den zwei angegebenen sortierten Listen von abgeschlossenen Intervallen
-// (die Intervalle in jeder Liste sind paarweise disjunkt)
-// zwei Listen von Werten, sodass jeder Wert im zugehoerigen Intervall
-// der Ursprungsliste liegt und zusaetzlich moeglichst viele Werte
-// in beiden Listen vorkommen.
+// zwei Listen von Werten, sodass
+//  - jeder Wert im zugehoerigen Intervall der Ursprungsliste liegt,
+//  - moeglichst viele Werte in beiden Listen vorkommen,
+//  - jede Liste moeglichst klein ist
 template <typename T>
 std::pair<std::vector<T>, std::vector<T>> GetStuetzpunkte(
     std::vector<Intervall<T>> stuetzpunkt_intervalle_1,
@@ -574,64 +575,50 @@ std::pair<std::vector<T>, std::vector<T>> GetStuetzpunkte(
   auto it2 = std::cbegin(stuetzpunkt_intervalle_2);
   auto end2 = std::cend(stuetzpunkt_intervalle_2);
 
+  auto NeuerStuetzpunkt = [&](
+      typename std::vector<Intervall<T>>::const_iterator& it,
+      typename std::vector<Intervall<T>>::const_iterator& end,
+      std::vector<T>& stuetzpunkte,
+      T stuetzpunkt) {
+    assert(it != end);
+    assert(stuetzpunkt >= it->first);
+    assert(stuetzpunkt <= it->second);
+    while ((it != end) && (stuetzpunkt >= it->first) && (stuetzpunkt <= it->second)) {
+      stuetzpunkte.push_back(stuetzpunkt);
+      ++it;
+    }
+  };
+
+  bool swapped = false;
   while (it1 != end1 || it2 != end2) {
     if (it2 == end2) {
-      const T stuetzpunkt = (it1->first + it1->second) / 2;
-      assert(stuetzpunkt >= it1->first);
-      assert(stuetzpunkt <= it1->second);
-      stuetzpunkte1.push_back(stuetzpunkt);
-      ++it1;
+      NeuerStuetzpunkt(it1, end1, stuetzpunkte1, (it1->first + it1->second) / 2);
     } else if (it1 == end1) {
-      const T stuetzpunkt = (it2->first + it2->second) / 2;
-      assert(stuetzpunkt >= it2->first);
-      assert(stuetzpunkt <= it2->second);
-      stuetzpunkte2.push_back(stuetzpunkt);
-      ++it2;
+      NeuerStuetzpunkt(it2, end2, stuetzpunkte2, (it2->first + it2->second) / 2);
     } else {
-      if (it1->first < it2->first) {
-        if (it2->first <= it1->second) {
-          const T stuetzpunkt = (it2->first + std::min(it2->second, it1->second)) / 2;
-          // Ueberlappung
-          assert(stuetzpunkt >= it1->first);
-          assert(stuetzpunkt <= it1->second);
-          stuetzpunkte1.push_back(stuetzpunkt);
-          assert(stuetzpunkt >= it2->first);
-          assert(stuetzpunkt <= it2->second);
-          stuetzpunkte2.push_back(stuetzpunkt);
-          ++it1;
-          ++it2;
-        } else {
-          const T stuetzpunkt = (it1->first + it1->second) / 2;
-          // Keine Ueberlappung
-          assert(stuetzpunkt >= it1->first);
-          assert(stuetzpunkt <= it1->second);
-          stuetzpunkte1.push_back(stuetzpunkt);
-          ++it1;
-        }
+      if (it2->first < it1->first) {
+        std::swap(it1, it2);
+        std::swap(end1, end2);
+        std::swap(stuetzpunkte1, stuetzpunkte2);
+        swapped = !swapped;
+      }
+      assert(it1->first <= it2->first);
+
+      if (it2->first <= it1->second) {
+        // Ueberlappung
+        const T stuetzpunkt = (it2->first + std::min(it2->second, it1->second)) / 2;
+        NeuerStuetzpunkt(it1, end1, stuetzpunkte1, stuetzpunkt);
+        NeuerStuetzpunkt(it2, end2, stuetzpunkte2, stuetzpunkt);
       } else {
-        if (it1->first <= it2->second) {
-          const T stuetzpunkt = (it1->first + std::min(it1->second, it2->second)) / 2;
-          // Ueberlappung
-          assert(stuetzpunkt >= it1->first);
-          assert(stuetzpunkt <= it1->second);
-          stuetzpunkte1.push_back(stuetzpunkt);
-          assert(stuetzpunkt >= it2->first);
-          assert(stuetzpunkt <= it2->second);
-          stuetzpunkte2.push_back(stuetzpunkt);
-          ++it1;
-          ++it2;
-        } else {
-          const T stuetzpunkt = (it2->first + it2->second) / 2;
-          // Keine Ueberlappung
-          assert(stuetzpunkt >= it2->first);
-          assert(stuetzpunkt <= it2->second);
-          stuetzpunkte2.push_back(stuetzpunkt);
-          ++it2;
-        }
+        // Keine Ueberlappung
+        NeuerStuetzpunkt(it1, end1, stuetzpunkte1, (it1->first + it1->second) / 2);
       }
     }
   }
 
+  if (swapped) {
+    std::swap(stuetzpunkte1, stuetzpunkte2);
+  }
   assert(stuetzpunkte1.size() == stuetzpunkt_intervalle_1.size());
   assert(stuetzpunkte2.size() == stuetzpunkt_intervalle_2.size());
 
@@ -724,23 +711,36 @@ Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int za
       const std::vector<int>& stuetzpunkte, const std::vector<int>& stuetzpunkte2,
       int y_oben_mm, int y_unten_mm, int abstand_oben_mm, int abstand_unten_mm, bool istOben) {
     assert(x_abstaende.size() == ziffern.size() + 1);
-    assert(stuetzpunkte.size() == ziffern.size() + 1);
+    assert(stuetzpunkte.size() == 2 * ziffern.size());
 
     int offset = tp.XLinks() + x_abstaende.front();
 
     for (size_t i = 0; i < ziffern.size(); ++i) {
       const int ziffer_breite = tp.tex_ziffern[ziffern[i]].breite_mm;
 
-      assert(offset >= stuetzpunkte[i]);
-      assert(offset + ziffer_breite <= stuetzpunkte[i+1]);
+      assert(offset >= stuetzpunkte[2*i]);
+      assert(offset + ziffer_breite <= stuetzpunkte[2*i+1]);
       MakeZiffer(ziffern[i], y_oben_mm, y_unten_mm, abstand_oben_mm, abstand_unten_mm,
-          stuetzpunkte[i],
-          stuetzpunkte[i + 1],
-          offset - stuetzpunkte[i],
-          stuetzpunkte[i+1] - (offset + ziffer_breite),
+          stuetzpunkte[2*i],
+          stuetzpunkte[2*i + 1],
+          offset - stuetzpunkte[2*i],
+          stuetzpunkte[2*i+1] - (offset + ziffer_breite),
           stuetzpunkte2,
           istOben);
       offset += ziffer_breite + x_abstaende[i+1];
+
+      // Falls die naechste Ziffer nicht unmittelbar anschliesst,
+      // fuege eine leere Ziffer (Index 10) ein.
+      if ((i < ziffern.size() - 1) && (stuetzpunkte[2*i + 1] != stuetzpunkte[2*i + 2])) {
+        assert(stuetzpunkte[2*i + 1] < stuetzpunkte[2*i + 2]);
+        MakeZiffer(10, y_oben_mm, y_unten_mm, abstand_oben_mm, abstand_unten_mm,
+            stuetzpunkte[2*i + 1],
+            stuetzpunkte[2*i + 2],
+            0,
+            0,
+            stuetzpunkte2,
+            istOben);
+      }
     }
   };
 
@@ -987,7 +987,7 @@ static constexpr float AbstandX(bool gross) {
   return gross ? kAbstandXGross_mm : kAbstandXKlein_mm;
 }
 
-static constexpr std::array<Textur, 10> MakeZiffernTexturen(bool gross) {
+static constexpr std::array<Textur, 11> MakeZiffernTexturen(bool gross) {
   return {{
     MakeZiffernTextur(gross ? 231 : 157,  19.000,           38.095, AbstandX(gross), gross ? 310 : 210,      68,  51),
     MakeZiffernTextur(gross ?  89 :  60,  15.000,           14.695, AbstandX(gross), gross ? 310 : 210,       7,  51),
@@ -1001,11 +1001,14 @@ static constexpr std::array<Textur, 10> MakeZiffernTexturen(bool gross) {
     MakeZiffernTextur(gross ? 183 : 124, 185.850,           30.150, AbstandX(gross), gross ? 310 : 210,       7,  51),
     // Ziffer 9 ist eine gedrehte Ziffer 6
     MakeZiffernTextur(gross ? 201 : 136,  93.066 + 33.030, -33.030, AbstandX(gross), gross ? 310 : 210,  7 + 51, -51),
+
+    // Leertextur, falls Abstand > max. Ziffernabstand
+    MakeZiffernTextur(                1,       5,                5,               0,                 0,       0,   0),
   }};
 }
 
-static constexpr std::array<Textur, 10> kZiffernTexturenGross = MakeZiffernTexturen(true);
-static constexpr std::array<Textur, 10> kZiffernTexturenKlein = MakeZiffernTexturen(false);
+static constexpr std::array<Textur, 11> kZiffernTexturenGross = MakeZiffernTexturen(true);
+static constexpr std::array<Textur, 11> kZiffernTexturenKlein = MakeZiffernTexturen(false);
 
 // Z-Verschiebung fuer die hohe Variante der Tafel
 static constexpr float kZVerschiebungHoch = 2.4f;
