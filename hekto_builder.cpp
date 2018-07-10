@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <functional>
 #include <iterator>
+#include <limits>
+#include <type_traits>
 #include <utility>
 
 
@@ -208,7 +210,14 @@ void MakeQuad(Mesh* mesh, VertexIndex v1, VertexIndex v2, VertexIndex v3,
   bool seitenwechsel = false;
 
   auto cur_vertex_idx = v3;
+  auto last_pos = std::numeric_limits<std::remove_reference_t<decltype(*intermediate_begin)>>::min();
   for (auto it = intermediate_begin; it < intermediate_end; ++it) {
+    // Ignoriere mehrere Stuetzpunkte mit derselben Koordinate.
+    if (*it == last_pos) {
+      continue;
+    }
+    last_pos = *it;
+
     auto last_vertex_idx = cur_vertex_idx;
 
     auto cur_vertex = v3_vertex;
