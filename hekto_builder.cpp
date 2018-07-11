@@ -82,6 +82,16 @@ void SubsetBuilder::Write(FILE* fd) {
       tagfarbe_, nachtfarbe_);
 
   for (const auto& vertex : m_mesh.vertices) {
+    assert(std::isfinite(vertex.pos_x));
+    assert(std::isfinite(vertex.pos_y));
+    assert(std::isfinite(vertex.pos_z));
+    assert(std::isfinite(vertex.nor_x));
+    assert(std::isfinite(vertex.nor_y));
+    assert(std::isfinite(vertex.nor_z));
+    assert(std::isfinite(vertex.u1));
+    assert(std::isfinite(vertex.v1));
+    assert(std::isfinite(vertex.u2));
+    assert(std::isfinite(vertex.v2));
     fprintf(fd,
         "<Vertex U=\"%f\" V=\"%f\" U2=\"%f\" V2=\"%f\">\n"
         "<p X=\"%f\" Y=\"%f\" Z=\"%f\"/>\n"
@@ -998,6 +1008,7 @@ static constexpr float AbstandX(bool gross) {
 
 static constexpr std::array<Textur, 11> MakeZiffernTexturen(bool gross) {
   return {{
+    //                        breite_mm, x_links_px,     breite_px, abstand_x_mm,       hoehe_mm, y_unten_px, hoehe_px
     MakeZiffernTextur(gross ? 231 : 157,  19.000,           38.095, AbstandX(gross), gross ? 310 : 210,      68,  51),
     MakeZiffernTextur(gross ?  89 :  60,  15.000,           14.695, AbstandX(gross), gross ? 310 : 210,       7,  51),
     MakeZiffernTextur(gross ? 190 : 129,  45.689,           31.383, AbstandX(gross), gross ? 310 : 210,       7,  51),
@@ -1012,7 +1023,7 @@ static constexpr std::array<Textur, 11> MakeZiffernTexturen(bool gross) {
     MakeZiffernTextur(gross ? 201 : 136,  93.066 + 33.030, -33.030, AbstandX(gross), gross ? 310 : 210,  7 + 51, -51),
 
     // Leertextur, falls Abstand > max. Ziffernabstand
-    MakeZiffernTextur(                1,       5,                5,               0,                 0,       0,   0),
+    MakeZiffernTextur(                1,       5,                1,               0,                 5,       0,   1),
   }};
 }
 
