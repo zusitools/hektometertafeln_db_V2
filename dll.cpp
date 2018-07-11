@@ -61,7 +61,7 @@ DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
 }
 
 DLL_EXPORT const char* dllVersion() {
-  return "0.0.8";
+  return "0.0.9";
 }
 
 DLL_EXPORT const char* Autor() {
