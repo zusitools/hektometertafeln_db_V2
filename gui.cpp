@@ -13,6 +13,11 @@ static const char* kPropBauparameter = "__HEKTO_BAUPARAMETER";
 HINSTANCE kHinstDll;
 
 BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+  auto SetzeUeberlaengeAktiviert = [hwnd](bool aktiviert) {
+    EnableWindow(GetDlgItem(hwnd, IDC_BASIS_KM), aktiviert);
+    EnableWindow(GetDlgItem(hwnd, IDC_BASIS_HM), aktiviert);
+  };
+
   switch (Message) {
     case WM_INITDIALOG: {
       auto* config = reinterpret_cast<HektoDllConfig*>(lParam);
@@ -24,6 +29,7 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
       CheckDlgButton(hwnd, IDC_ANKERPUNKT, config->ankerpunkt == Ankerpunkt::kYes);
       CheckDlgButton(hwnd, IDC_IMMER_OHNE_MAST, config->immer_ohne_mast);
       CheckDlgButton(hwnd, IDC_HAT_UEBERLAENGE, config->hat_ueberlaenge);
+      SetzeUeberlaengeAktiviert(config->hat_ueberlaenge);
 
       const auto handle_basis_km = GetDlgItem(hwnd, IDC_BASIS_KM);
       SendMessage(handle_basis_km, WM_SETTEXT, 0, (LPARAM)(std::to_string(config->basis_km).c_str()));
@@ -37,6 +43,9 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
     case WM_COMMAND: {
       auto* config = static_cast<HektoDllConfig*>(GetProp(hwnd, kPropBauparameter));
       switch (LOWORD(wParam)) {
+        case IDC_HAT_UEBERLAENGE:
+          SetzeUeberlaengeAktiviert(IsDlgButtonChecked(hwnd, IDC_HAT_UEBERLAENGE));
+          break;
         case IDOK:
           config->beidseitig = IsDlgButtonChecked(hwnd, IDC_BEIDSEITIG) ? Beidseitig::kBeidseitig : Beidseitig::kEinseitig;
           config->groesse = IsDlgButtonChecked(hwnd, IDC_KLEIN) ? Groesse::kKlein : Groesse::kGross;
