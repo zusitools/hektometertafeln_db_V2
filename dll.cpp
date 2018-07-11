@@ -107,11 +107,17 @@ const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilom
 }
 
 DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
+  *datei = nullptr;
+
   Kilometrierung km_basis =
     g_config.hat_ueberlaenge ? Kilometrierung { g_config.basis_km, g_config.basis_hm } : Kilometrierung::fromMeter(wert_m);
   Kilometrierung km_tatsaechlich =
     g_config.hat_ueberlaenge ? Kilometrierung::fromMeter(wert_m) : km_basis;
   const auto ueberlaenge_hm = km_tatsaechlich.toHektometer() - km_basis.toHektometer();
+
+  if ((ueberlaenge_hm < 0) || (ueberlaenge_hm > 99)) {
+    return 0;
+  }
 
   auto standort = static_cast<Standort>(modus);
   BauParameter bauparameter = {
