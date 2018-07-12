@@ -95,11 +95,12 @@ DLL_EXPORT void Config(HWND appHandle) {
 const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilometrierung, int ueberlaenge_hm) {
   CreateDirectory(g_zielverzeichnis, nullptr);
   snprintf(g_outDatei, sizeof(g_outDatei)/sizeof(g_outDatei[0]),
-      "%s\\Hekto%s%s%s_%d_%d%s.ls3", g_zielverzeichnis,
+      "%s\\Hekto%s%s%s_%s%d_%d%s.ls3", g_zielverzeichnis,
       (bau_parameter.mast == Mast::kMitMast ? "_Mast" : ""),
       (bau_parameter.beidseitig == Beidseitig::kBeidseitig ? "_beids" : ""),
       (bau_parameter.groesse == Groesse::kKlein ? "_klein" : ""),
-      kilometrierung.km,
+      (kilometrierung.istNegativ() ? "-" : ""),
+      std::abs(kilometrierung.km),
       std::abs(kilometrierung.hm),
       ueberlaenge_hm == 0 ? "" : (std::string("_") + std::to_string(ueberlaenge_hm)).c_str());
 
