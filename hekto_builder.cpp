@@ -235,6 +235,7 @@ void MakeQuad(Mesh* mesh, VertexIndex v1, VertexIndex v2, VertexIndex v3,
 
     // Berechne t mit v4 = v3 + t(v4-v3)
     const float t = (cur_vertex.pos_y - v3_vertex.pos_y) / (v4_vertex.pos_y - v3_vertex.pos_y);
+    assert(std::isfinite(t));
     cur_vertex.u1 += t * (v4_vertex.u1 - v3_vertex.u1);
     cur_vertex.u2 += t * (v4_vertex.u2 - v3_vertex.u2);
 
@@ -699,8 +700,8 @@ Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int za
 
     const auto& textur = tp.tex_ziffern[ziffer];
 
-    const float tex_per_mm_u = (textur.u_rechts - textur.u_links) / textur.breite_mm;
-    const float tex_per_mm_v = (textur.v_unten - textur.v_oben) / textur.hoehe_mm;
+    const float tex_per_mm_u = textur.breite_mm == 0 ? 0 : (textur.u_rechts - textur.u_links) / textur.breite_mm;
+    const float tex_per_mm_v = textur.hoehe_mm == 0 ? 0 : (textur.v_unten - textur.v_oben) / textur.hoehe_mm;
 
     const float u_links = textur.u_links - abstand_links_mm * tex_per_mm_u;
     const float u_rechts = textur.u_rechts + abstand_rechts_mm * tex_per_mm_u;
@@ -986,8 +987,8 @@ static constexpr Textur MakeZiffernTextur(
     int hoehe_mm, float y_unten_px, float hoehe_px) {
   return MakeTexturInkscape(
       breite_mm + 2 * abstand_x_mm,
-      x_links_px - abstand_x_mm / breite_mm * breite_px,
-      breite_px + 2 * abstand_x_mm / breite_mm * breite_px,
+      x_links_px - (breite_mm == 0 ? 0 : abstand_x_mm / breite_mm) * breite_px,
+      breite_px + 2 * (breite_mm == 0 ? 0 : abstand_x_mm / breite_mm) * breite_px,
       hoehe_mm, y_unten_px, hoehe_px);
 }
 
@@ -1023,7 +1024,7 @@ static constexpr std::array<Textur, 11> MakeZiffernTexturen(bool gross) {
     MakeZiffernTextur(gross ? 201 : 136,  93.066 + 33.030, -33.030, AbstandX(gross), gross ? 310 : 210,  7 + 51, -51),
 
     // Leertextur, falls Abstand > max. Ziffernabstand
-    MakeZiffernTextur(                1,       5,                1,               0,                 5,       0,   1),
+    MakeZiffernTextur(                0,       5,                0,               0,                 0,       0,   0),
   }};
 }
 
