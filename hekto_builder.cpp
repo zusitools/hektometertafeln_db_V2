@@ -653,7 +653,7 @@ Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int za
   assert(ziffer_unten >= 0);
   assert(ziffer_unten <= 9);
   assert(!ueberlaenge.has_value() || (ueberlaenge >= 0));
-  assert(!ueberlaenge.has_value() || (ueberlaenge <= 99));
+  assert(!ueberlaenge.has_value() || (ueberlaenge <= kMaxUeberlaenge));
 
   const auto& ziffern_oben = GetZiffern(zahl_oben);
   assert(ziffern_oben.size() >= 1);
@@ -1046,7 +1046,7 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, Kilometrier
   assert(ziffer_unten >= 0);
   assert(ziffer_unten <= 9);
   assert(!ueberlaenge_hm.has_value() || (ueberlaenge_hm >= 0));
-  assert(!ueberlaenge_hm.has_value() || (ueberlaenge_hm <= 99));
+  assert(!ueberlaenge_hm.has_value() || (ueberlaenge_hm <= kMaxUeberlaenge));
 
   fprintf(fd,
       "\xef\xbb\xbf"

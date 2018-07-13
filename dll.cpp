@@ -115,7 +115,7 @@ DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
   const auto ueberlaenge_hm = g_config.hat_ueberlaenge ?
     std::optional { Kilometrierung::fromMeter(wert_m).toHektometer() - km_basis.toHektometer() } : std::nullopt;
 
-  if (ueberlaenge_hm.has_value() && ((ueberlaenge_hm < 0) || (ueberlaenge_hm > 99))) {
+  if (ueberlaenge_hm.has_value() && ((ueberlaenge_hm < 0) || (ueberlaenge_hm > kMaxUeberlaenge))) {
     return 0;
   }
 
