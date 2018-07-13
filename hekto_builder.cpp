@@ -647,21 +647,21 @@ std::pair<std::vector<T>, std::vector<T>> GetStuetzpunkte(
 
 }  // namespace
 
-Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten, int ueberlaenge) {
+Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten, std::optional<int> ueberlaenge) {
   assert(zahl_oben >= 0);
   assert(zahl_oben <= 999);
   assert(ziffer_unten >= 0);
   assert(ziffer_unten <= 9);
-  assert(ueberlaenge >= 0);
-  assert(ueberlaenge <= 99);
+  assert(!ueberlaenge.has_value() || (ueberlaenge >= 0));
+  assert(!ueberlaenge.has_value() || (ueberlaenge <= 99));
 
   const auto& ziffern_oben = GetZiffern(zahl_oben);
   assert(ziffern_oben.size() >= 1);
   assert(ziffern_oben.size() <= 3);
 
   std::vector<int> ziffern_unten = { ziffer_unten };
-  if (ueberlaenge > 0) {
-    const auto& ziffern_ueberlaenge = GetZiffern(ueberlaenge);
+  if (ueberlaenge.has_value()) {
+    const auto& ziffern_ueberlaenge = GetZiffern(*ueberlaenge);
     ziffern_unten.insert(std::end(ziffern_unten), std::cbegin(ziffern_ueberlaenge), std::cend(ziffern_ueberlaenge));
   }
   assert(ziffern_unten.size() >= 1);
@@ -795,7 +795,7 @@ Ziffern ZiffernBuilder::Build(const TafelParameter& tp, bool ist_negativ, int za
     plusminus_mesh.faces.emplace_back(v3, v4, v1);
   }
 
-  if (ueberlaenge > 0) {
+  if (ueberlaenge.has_value()) {
     assert(abstaende_unten.size() >= 2);
     assert(ziffern_unten.size() >= 1);
 
@@ -1036,7 +1036,7 @@ static constexpr float kZVerschiebungHoch = 2.4f;
 
 }  // namespace
 
-void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, Kilometrierung kilometrierung, int ueberlaenge_hm) {
+void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, Kilometrierung kilometrierung, std::optional<int> ueberlaenge_hm) {
   const bool ist_negativ = kilometrierung.istNegativ();
   const int zahl_oben = std::abs(kilometrierung.km);
   const int ziffer_unten = std::abs(kilometrierung.hm);
@@ -1045,7 +1045,8 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, Kilometrier
   assert(zahl_oben <= 999);
   assert(ziffer_unten >= 0);
   assert(ziffer_unten <= 9);
-  assert(ueberlaenge_hm >= 0);
+  assert(!ueberlaenge_hm.has_value() || (ueberlaenge_hm >= 0));
+  assert(!ueberlaenge_hm.has_value() || (ueberlaenge_hm <= 99));
 
   fprintf(fd,
       "\xef\xbb\xbf"
@@ -1068,7 +1069,7 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, Kilometrier
 
   const float mm_per_px = bauparameter.groesse == Groesse::kKlein ? 210.0f / 51.0f : 310.0f / 51.0f;
 
-  const bool breit = (ist_negativ && (zahl_oben >= 10)) || (zahl_oben >= 100) || (ueberlaenge_hm > 0);
+  const bool breit = (ist_negativ && (zahl_oben >= 10)) || (zahl_oben >= 100) || ueberlaenge_hm.has_value();
 
   TafelParameter tp = bauparameter.groesse == Groesse::kKlein ?
     TafelParameter {

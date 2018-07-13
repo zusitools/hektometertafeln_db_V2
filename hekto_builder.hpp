@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <cmath>
+#include <optional>
 #include <vector>
 
 enum class Hoehe { kHoch, kNiedrig };
@@ -85,7 +86,7 @@ class TafelVorderseiteBuilder final {
 
 class ZiffernBuilder final {
  public:
-  static Ziffern Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten, int ueberlaenge);
+  static Ziffern Build(const TafelParameter& tp, bool ist_negativ, int zahl_oben, int ziffer_unten, std::optional<int> ueberlaenge);
 };
 
 class MastBuilder final {
@@ -95,7 +96,7 @@ class MastBuilder final {
 
 class HektoBuilder final {
  public:
-  static void Build(FILE* fd, const BauParameter& bauparameter, Kilometrierung kilometrierung, int ueberlaenge_hm);
+  static void Build(FILE* fd, const BauParameter& bauparameter, Kilometrierung kilometrierung, std::optional<int> ueberlaenge_hm);
 };
 
 #endif  // HEKTO_BUILDER_HPP_

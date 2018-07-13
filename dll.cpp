@@ -92,7 +92,7 @@ DLL_EXPORT void Config(HWND appHandle) {
   ShowGui(appHandle, &g_config);
 }
 
-const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilometrierung, int ueberlaenge_hm) {
+const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilometrierung, std::optional<int> ueberlaenge_hm) {
   CreateDirectory(g_zielverzeichnis, nullptr);
   snprintf(g_outDatei, sizeof(g_outDatei)/sizeof(g_outDatei[0]),
       "%s\\Hekto%s%s%s_%s%d_%d%s.ls3", g_zielverzeichnis,
@@ -102,7 +102,7 @@ const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilom
       (kilometrierung.istNegativ() ? "-" : ""),
       std::abs(kilometrierung.km),
       std::abs(kilometrierung.hm),
-      ueberlaenge_hm == 0 ? "" : (std::string("_") + std::to_string(ueberlaenge_hm)).c_str());
+      (ueberlaenge_hm.has_value() ? (std::string("_") + std::to_string(*ueberlaenge_hm)).c_str() : ""));
 
   return g_outDatei;
 }
@@ -110,13 +110,12 @@ const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilom
 DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
   *datei = nullptr;
 
-  Kilometrierung km_basis =
-    g_config.hat_ueberlaenge ? Kilometrierung { g_config.basis_km, g_config.basis_hm } : Kilometrierung::fromMeter(wert_m);
-  Kilometrierung km_tatsaechlich =
-    g_config.hat_ueberlaenge ? Kilometrierung::fromMeter(wert_m) : km_basis;
-  const auto ueberlaenge_hm = km_tatsaechlich.toHektometer() - km_basis.toHektometer();
+  Kilometrierung km_basis = g_config.hat_ueberlaenge ?
+    Kilometrierung { g_config.basis_km, g_config.basis_hm } : Kilometrierung::fromMeter(wert_m);
+  const auto ueberlaenge_hm = g_config.hat_ueberlaenge ?
+    std::optional { Kilometrierung::fromMeter(wert_m).toHektometer() - km_basis.toHektometer() } : std::nullopt;
 
-  if ((ueberlaenge_hm < 0) || (ueberlaenge_hm > 99)) {
+  if (ueberlaenge_hm.has_value() && ((ueberlaenge_hm < 0) || (ueberlaenge_hm > 99))) {
     return 0;
   }
 
