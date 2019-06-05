@@ -93,7 +93,6 @@ DLL_EXPORT void Config(HWND appHandle) {
 }
 
 const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilometrierung, std::optional<int> ueberlaenge_hm) {
-  CreateDirectory(g_zielverzeichnis, nullptr);
   snprintf(g_outDatei, sizeof(g_outDatei)/sizeof(g_outDatei[0]),
       "%s\\Hekto%s%s%s_%s%d_%d%s.ls3", g_zielverzeichnis,
       (bau_parameter.mast == Mast::kMitMast ? "_Mast" : ""),
@@ -105,6 +104,24 @@ const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilom
       (ueberlaenge_hm.has_value() ? (std::string("_") + std::to_string(*ueberlaenge_hm)).c_str() : ""));
 
   return g_outDatei;
+}
+
+// "name": kein abschliessender Slash/Backslash
+bool CreateDirectoryWithParents(std::string name) {
+  const auto attrib = GetFileAttributes(name.c_str());
+  if (attrib == INVALID_FILE_ATTRIBUTES) {
+    static const std::string separators { "/\\" };
+    const auto lastSlashPos = name.find_last_of(separators);
+    if (lastSlashPos == std::string::npos) {
+      return false;
+    }
+    if (!CreateDirectoryWithParents(name.substr(0, lastSlashPos))) {
+      return false;
+    }
+    return CreateDirectory(name.c_str(), nullptr);
+  } else {
+    return (attrib & FILE_ATTRIBUTE_DIRECTORY) != 0 || (attrib & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
+  }
 }
 
 DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
@@ -130,6 +147,9 @@ DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
   };
 
   *datei = GetDateiname(bauparameter, km_basis, ueberlaenge_hm) + g_zusi_datenpfad_laenge;
+  if (!CreateDirectoryWithParents(g_zielverzeichnis)) {
+    return 0;
+  }
 
   FILE* fd = fopen(g_outDatei, "w");
   assert(fd != nullptr);
