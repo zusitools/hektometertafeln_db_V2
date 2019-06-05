@@ -13,5 +13,6 @@
 #define IDC_HAT_UEBERLAENGE 205
 #define IDC_BASIS_KM 206
 #define IDC_BASIS_HM 207
+#define IDC_TEXTUR 208
 
 #endif  // RESOURCE_HPP_

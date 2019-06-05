@@ -37,6 +37,13 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
       const auto handle_basis_hm = GetDlgItem(hwnd, IDC_BASIS_HM);
       SendMessage(handle_basis_hm, WM_SETTEXT, 0, (LPARAM)(std::to_string(config->basis_hm).c_str()));
 
+      const auto handle_textur = GetDlgItem(hwnd, IDC_TEXTUR);
+      SendMessage(handle_textur, CB_ADDSTRING, 0, (LPARAM)("Standard"));
+      SendMessage(handle_textur, CB_ADDSTRING, 0, (LPARAM)("Tunnel"));
+      SendMessage(handle_textur, CB_ADDSTRING, 0, (LPARAM)("Verwittert 1"));
+      SendMessage(handle_textur, CB_ADDSTRING, 0, (LPARAM)("Verwittert 2"));
+      SendMessage(handle_textur, CB_SETCURSEL, static_cast<WPARAM>(config->textur), 0);
+
       return TRUE;
     }
 
@@ -46,7 +53,7 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
         case IDC_HAT_UEBERLAENGE:
           SetzeUeberlaengeAktiviert(IsDlgButtonChecked(hwnd, IDC_HAT_UEBERLAENGE));
           break;
-        case IDOK:
+        case IDOK: {
           config->beidseitig = IsDlgButtonChecked(hwnd, IDC_BEIDSEITIG) ? Beidseitig::kBeidseitig : Beidseitig::kEinseitig;
           config->groesse = IsDlgButtonChecked(hwnd, IDC_KLEIN) ? Groesse::kKlein : Groesse::kGross;
           config->rueckstrahlend = IsDlgButtonChecked(hwnd, IDC_RUECKSTRAHLEND) ? Rueckstrahlend::kYes : Rueckstrahlend::kNo;
@@ -60,8 +67,12 @@ BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lPara
           GetDlgItemText(hwnd, IDC_BASIS_HM, buf, sizeof(buf)/sizeof(buf[0]));
           config->basis_hm = atoi(buf);
 
+          const auto handle_textur = GetDlgItem(hwnd, IDC_TEXTUR);
+          config->textur = static_cast<TexturDatei>(SendMessage(handle_textur, CB_GETCURSEL, 0, 0));
+
           EndDialog(hwnd, IDOK);
           break;
+        }
         case IDCANCEL:
           EndDialog(hwnd, IDCANCEL);
           break;

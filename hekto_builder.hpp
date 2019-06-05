@@ -17,6 +17,7 @@ enum class Beidseitig { kBeidseitig, kEinseitig };
 enum class Groesse { kGross, kKlein };
 enum class Rueckstrahlend { kYes, kNo };
 enum class Ankerpunkt { kYes, kNo };
+enum class TexturDatei { kStandard = 0, kTunnel = 1, kVerwittert1 = 2, kVerwittert2 = 3 };
 
 struct BauParameter final {
   Hoehe hoehe;
@@ -25,6 +26,7 @@ struct BauParameter final {
   Groesse groesse;
   Rueckstrahlend rueckstrahlend;
   Ankerpunkt ankerpunkt;
+  TexturDatei textur;
 };
 
 struct TafelParameter;
@@ -67,13 +69,14 @@ struct Ziffern final {
 
 class SubsetBuilder final {
  public:
-  SubsetBuilder(uint32_t tagfarbe, uint32_t nachtfarbe);
+  SubsetBuilder(uint32_t tagfarbe, uint32_t nachtfarbe, size_t textur_idx);
   void AddMesh(const Mesh& mesh);
   void Write(FILE* fd);
  private:
   Mesh m_mesh {};
   uint32_t tagfarbe_ {};
   uint32_t nachtfarbe_ {};
+  size_t textur_idx_ {};
 };
 
 class TafelRueckseiteBuilder final {

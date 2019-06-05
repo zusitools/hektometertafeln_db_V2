@@ -10,6 +10,7 @@ struct HektoDllConfig final {
   Groesse groesse;
   Rueckstrahlend rueckstrahlend;
   Ankerpunkt ankerpunkt;
+  TexturDatei textur;
   bool immer_ohne_mast;
   bool hat_ueberlaenge;
   int basis_km;

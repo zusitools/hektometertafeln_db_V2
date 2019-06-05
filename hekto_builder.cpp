@@ -56,8 +56,8 @@ struct TafelParameter final {
   }
 };
 
-SubsetBuilder::SubsetBuilder(uint32_t tagfarbe, uint32_t nachtfarbe)
-    : tagfarbe_(tagfarbe), nachtfarbe_(nachtfarbe) { }
+SubsetBuilder::SubsetBuilder(uint32_t tagfarbe, uint32_t nachtfarbe, size_t textur_idx)
+    : tagfarbe_(tagfarbe), nachtfarbe_(nachtfarbe), textur_idx_(textur_idx) { }
 
 void SubsetBuilder::AddMesh(const Mesh& mesh) {
   VertexIndex indexOffset = m_mesh.vertices.size();
@@ -74,12 +74,20 @@ void SubsetBuilder::Write(FILE* fd) {
     return;
   }
 
+  static const std::array textur_suffixe {
+    "",
+    "_tunnel",
+    "_verwittert_1",
+    "_verwittert_2",
+  };
+  const auto textur_suffix_idx = std::clamp(textur_idx_, static_cast<size_t>(0), textur_suffixe.size());
+
   fprintf(fd,
       "<SubSet Cd=\"%08X\" Ce=\"%08X\">\n"
       "<RenderFlags TexVoreinstellung=\"3\"/>\n"
-      "<Textur><Datei Dateiname=\"_Setup\\lib\\milepost\\hektometertafeln_DB_v2\\hektometertafel.dds\"/></Textur>\n"
-      "<Textur><Datei Dateiname=\"_Setup\\lib\\milepost\\hektometertafeln_DB_v2\\hektometertafel.dds\"/></Textur>\n",
-      tagfarbe_, nachtfarbe_);
+      "<Textur><Datei Dateiname=\"_Setup\\lib\\milepost\\hektometertafeln_DB_v2\\hektometertafel%s.dds\"/></Textur>\n"
+      "<Textur><Datei Dateiname=\"_Setup\\lib\\milepost\\hektometertafeln_DB_v2\\hektometertafel%s.dds\"/></Textur>\n",
+      tagfarbe_, nachtfarbe_, textur_suffixe[textur_suffix_idx], textur_suffixe[textur_suffix_idx]);
 
   for (const auto& vertex : m_mesh.vertices) {
     assert(std::isfinite(vertex.pos_x));
@@ -1057,11 +1065,11 @@ void HektoBuilder::Build(FILE* fd, const BauParameter& bauparameter, Kilometrier
       "</Info>\n"
       "<Landschaft>\n");
 
-  const uint32_t grundfarbe = 0xFFFFFF;
-  const uint32_t nachtfarbe = 0x646464;
+  const uint32_t grundfarbe = bauparameter.textur == TexturDatei::kTunnel ? 0xC0C0C0 : 0xFFFFFF;
+  const uint32_t nachtfarbe = bauparameter.textur == TexturDatei::kTunnel ? 0xC0C0C0 : 0x646464;
 
-  SubsetBuilder subset_unbeleuchtet(grundfarbe | 0xFF000000, 0xFF000000);
-  SubsetBuilder subset_beleuchtet((grundfarbe - nachtfarbe) | 0xFF000000, nachtfarbe | 0xFF000000);
+  SubsetBuilder subset_unbeleuchtet(grundfarbe | 0xFF000000, 0xFF000000, static_cast<size_t>(bauparameter.textur));
+  SubsetBuilder subset_beleuchtet((grundfarbe - nachtfarbe) | 0xFF000000, nachtfarbe | 0xFF000000, static_cast<size_t>(bauparameter.textur));
   auto& subset_evtl_beleuchtet = (bauparameter.rueckstrahlend == Rueckstrahlend::kYes ? subset_beleuchtet : subset_unbeleuchtet);
 
   // Die Spiegelung der Vorder- und Rueckseitentextur ist abhaengig vom dargestellten Wert

@@ -24,6 +24,7 @@ HektoDllConfig g_config = {
   Groesse::kGross,
   Rueckstrahlend::kNo,
   Ankerpunkt::kNo,
+  TexturDatei::kStandard,
   /* immer_ohne_mast */ false,
   /* hat_ueberlaenge */ false,
   /* basis_km */ 0,
@@ -172,7 +173,8 @@ DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
     g_config.beidseitig,
     g_config.groesse,
     g_config.rueckstrahlend,
-    g_config.ankerpunkt
+    g_config.ankerpunkt,
+    g_config.textur
   };
 
   *datei = GetDateiname(bauparameter, km_basis, ueberlaenge_hm) + g_zusi_datenpfad_laenge;

@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-IDD_HEKTO_CONFIG DIALOG 0, 0, 150, 145
+IDD_HEKTO_CONFIG DIALOG 0, 0, 150, 165
 STYLE DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Konfiguration"
 FONT 8, "MS Sans Serif"
@@ -17,5 +17,7 @@ BEGIN
   EDITTEXT                                        IDC_BASIS_KM,        35, 100, 30, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
   LTEXT      "hm",                                0,                   70, 103, 10, 10, WS_CHILD | WS_VISIBLE
   EDITTEXT                                        IDC_BASIS_HM,        85, 100, 30, 15, WS_CHILD | WS_VISIBLE | WS_TABSTOP
-  PUSHBUTTON "&OK",                               IDOK,                90, 121, 50, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
+  LTEXT      "Textur",                            0,                   10, 124, 35, 10, WS_CHILD | WS_VISIBLE
+  COMBOBOX                                        IDC_TEXTUR,          40, 121, 100, 15, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+  PUSHBUTTON "&OK",                               IDOK,                90, 141, 50, 14, WS_CHILD | WS_VISIBLE | WS_TABSTOP
 END
