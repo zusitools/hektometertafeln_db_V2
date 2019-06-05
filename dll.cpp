@@ -8,6 +8,7 @@
 
 #include <shlwapi.h>
 
+#include <array>
 #include <cassert>
 #include <cstdio>
 #include <string>
@@ -37,8 +38,36 @@ enum class Standort : std::uint8_t {
 DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
   HKEY key;
   g_zusi_datenpfad_laenge = MAX_PATH;
-  if (!SUCCEEDED(RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Zusi3", 0, KEY_READ | KEY_WOW64_32KEY, &key)) ||
-      !SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnis", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+  if (!SUCCEEDED(RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Zusi3", 0, KEY_READ | KEY_WOW64_32KEY, &key))) {
+    return 0;
+  }
+
+  const auto hatDatenverzeichnisRegulaer = (RegQueryValueEx(key, "DatenVerzeichnis", nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS);
+  const auto hatDatenverzeichnisSteam = (RegQueryValueEx(key, "DatenVerzeichnisSteam", nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS);
+
+  if (hatDatenverzeichnisRegulaer && hatDatenverzeichnisSteam) {
+    // Wenn _InstSetup/usb.dat relativ zum Zusi-Verzeichnis existiert, sind wir eine regulaere Version
+    std::array<char, MAX_PATH> buf;
+    GetModuleFileName(nullptr, buf.data(), buf.size());
+    PathRemoveFileSpec(buf.data());
+    if (PathFileExists((std::string(buf.data()) + "\\_InstSetup\\usb.dat").c_str())) {
+      if (!SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnis", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+        return 0;
+      }
+    } else {
+      if (!SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnisSteam", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+        return 0;
+      }
+    }
+  } else if (hatDatenverzeichnisRegulaer) {
+    if (!SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnis", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+      return 0;
+    }
+  } else if (hatDatenverzeichnisSteam) {
+    if (!SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnisSteam", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+      return 0;
+    }
+  } else {
     return 0;
   }
 
