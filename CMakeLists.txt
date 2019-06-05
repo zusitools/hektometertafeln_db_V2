@@ -20,9 +20,11 @@ if (WIN32)
     dll.cpp
     gui.cpp
     gui.rc
+    version.rc
   )
 
   set_source_files_properties(gui.rc PROPERTIES LANGUAGE RC)
+  set_source_files_properties(version.rc PROPERTIES LANGUAGE RC)
 endif()
 
 add_library(hektometertafeln_DB_V2 SHARED ${SOURCES})
