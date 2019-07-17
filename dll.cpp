@@ -11,6 +11,7 @@
 #include <array>
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 #include <string>
 #include <utility>
 
@@ -56,10 +57,13 @@ DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
     if (type != REG_SZ) {
       return false;
     }
+    // "If the data has the REG_SZ, REG_MULTI_SZ or REG_EXPAND_SZ type, the string may not have been stored with the proper terminating null characters.
+    // Therefore, even if the function returns ERROR_SUCCESS, the application should ensure that the string is properly terminated before using it"
     if (g_zielverzeichnis[g_zusi_datenpfad_laenge - 1] != '\0') {
       g_zusi_datenpfad_laenge = std::min(g_zusi_datenpfad_laenge + 1, static_cast<DWORD>(MAX_PATH));
       g_zielverzeichnis[g_zusi_datenpfad_laenge - 1] = '\0';
     }
+    g_zusi_datenpfad_laenge = std::strlen(g_zielverzeichnis);
     return true;
   };
 
