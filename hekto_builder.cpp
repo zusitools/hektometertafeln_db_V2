@@ -588,10 +588,16 @@ std::vector<Intervall<int>> GetStuetzpunktIntervalle(const TafelParameter& tp, c
 }
 
 // Berechnet aus den zwei angegebenen sortierten Listen von abgeschlossenen Intervallen
-// zwei Listen von Werten, sodass
-//  - jeder Wert im zugehoerigen Intervall der Ursprungsliste liegt,
-//  - moeglichst viele Werte in beiden Listen vorkommen,
-//  - jede Liste moeglichst klein ist
+// zwei Listen von Werten (jeweils gleich lang wie die Ursprungsliste), sodass
+//  - jeder Wert im zugehoerigen Intervall der Ursprungsliste liegt und
+//  - moeglichst viele Werte in beiden Listen vorkommen.
+//
+//  Beispiel:
+//   intervalle1:   [.....][............][......]
+//   intervalle2:              [....][........]
+//
+//   stuetzpunkte1: X          X         X
+//   stuetzpunkte2:            X         X
 template <typename T>
 std::pair<std::vector<T>, std::vector<T>> GetStuetzpunkte(
     std::vector<Intervall<T>> stuetzpunkt_intervalle_1,
