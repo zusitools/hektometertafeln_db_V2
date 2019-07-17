@@ -46,33 +46,48 @@ DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
   const auto hatDatenverzeichnisRegulaer = (RegQueryValueEx(key, "DatenVerzeichnis", nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS);
   const auto hatDatenverzeichnisSteam = (RegQueryValueEx(key, "DatenVerzeichnisSteam", nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS);
 
+  const auto liesDatenverzeichnis = [&](const char* wertName) -> bool {
+    DWORD type;
+    g_zusi_datenpfad_laenge = MAX_PATH;
+    // Kann RegGetValue nicht nutzen, da auf Windows XP nicht unterstuetzt.
+    if (!SUCCEEDED(RegQueryValueEx(key, wertName, nullptr, &type, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+      return false;
+    }
+    if (type != REG_SZ) {
+      return false;
+    }
+    if (g_zielverzeichnis[g_zusi_datenpfad_laenge - 1] != '\0') {
+      g_zusi_datenpfad_laenge = std::min(g_zusi_datenpfad_laenge + 1, static_cast<DWORD>(MAX_PATH));
+      g_zielverzeichnis[g_zusi_datenpfad_laenge - 1] = '\0';
+    }
+    return true;
+  };
+
   if (hatDatenverzeichnisRegulaer && hatDatenverzeichnisSteam) {
     // Wenn _InstSetup/usb.dat relativ zum Zusi-Verzeichnis existiert, sind wir eine regulaere Version
     std::array<char, MAX_PATH> buf;
     GetModuleFileName(nullptr, buf.data(), buf.size());
     PathRemoveFileSpec(buf.data());
     if (PathFileExists((std::string(buf.data()) + "\\_InstSetup\\usb.dat").c_str())) {
-      if (!SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnis", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+      if (!liesDatenverzeichnis("DatenVerzeichnis")) {
         return 0;
       }
     } else {
-      if (!SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnisSteam", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+      if (!liesDatenverzeichnis("DatenVerzeichnisSteam")) {
         return 0;
       }
     }
   } else if (hatDatenverzeichnisRegulaer) {
-    if (!SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnis", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+    if (!liesDatenverzeichnis("DatenVerzeichnis")) {
       return 0;
     }
   } else if (hatDatenverzeichnisSteam) {
-    if (!SUCCEEDED(RegGetValue(key, nullptr, "DatenVerzeichnisSteam", RRF_RT_REG_SZ, nullptr, (LPBYTE)g_zielverzeichnis, &g_zusi_datenpfad_laenge))) {
+    if (!liesDatenverzeichnis("DatenVerzeichnisSteam")) {
       return 0;
     }
   } else {
     return 0;
   }
-
-  g_zusi_datenpfad_laenge -= 1;  // pcbData ist inklusive Nullterminator
 
   if (!PathAppend(g_zielverzeichnis, zielverzeichnis)) {
     return 0;
