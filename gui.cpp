@@ -12,7 +12,7 @@
 static const char* kPropBauparameter = "__HEKTO_BAUPARAMETER";
 HINSTANCE kHinstDll;
 
-BOOL CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK ConfigDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
   auto SetzeUeberlaengeAktiviert = [hwnd](bool aktiviert) {
     EnableWindow(GetDlgItem(hwnd, IDC_BASIS_KM), aktiviert);
     EnableWindow(GetDlgItem(hwnd, IDC_BASIS_HM), aktiviert);

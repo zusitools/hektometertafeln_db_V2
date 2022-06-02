@@ -33,6 +33,10 @@ if (WIN32)
   target_link_libraries(hektometertafeln_DB_V2 shlwapi)
 endif()
 
+set_target_properties(hektometertafeln_DB_V2 PROPERTIES PREFIX "") # no "lib..." in output name
+if (WIN32 AND (CMAKE_SIZEOF_VOID_P EQUAL 8))
+  set_target_properties(hektometertafeln_DB_V2 PROPERTIES SUFFIX ".64.dll")
+endif()
 target_compile_definitions(hektometertafeln_DB_V2 PRIVATE -DDLL_EXPORTS)
 if(MINGW)
   set_target_properties(hektometertafeln_DB_V2 PROPERTIES LINK_FLAGS -Wl,--kill-at)
