@@ -60,6 +60,14 @@ struct Kilometrierung {
 
 constexpr int kMaxUeberlaenge = 39;
 
+//       +-*--*-+
+//       |      |
+//       |      |
+//  +-*--+      +-*-+
+//  |               |
+//  |               |
+//  +-*--*--*---*-*-+
+
 struct Ziffern final {
   Mesh mesh1;
   Mesh mesh2;

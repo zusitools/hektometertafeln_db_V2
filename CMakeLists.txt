@@ -3,6 +3,8 @@ project(hektometertafeln)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffile-prefix-map=${CMAKE_SOURCE_DIR}=CMAKE_SOURCE_DIR")
+
 find_program(IWYU_PATH NAMES include-what-you-use)
 if (IWYU_PATH)
   set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
@@ -42,3 +44,6 @@ if(MINGW)
   set_target_properties(hektometertafeln_DB_V2 PROPERTIES LINK_FLAGS -Wl,--kill-at)
 endif()
 install(TARGETS hektometertafeln_DB_V2 DESTINATION bin)
+
+add_executable(testprog test.cpp)
+target_link_libraries(testprog PRIVATE hektometertafeln_DB_V2)
