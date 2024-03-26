@@ -151,10 +151,11 @@ DLL_EXPORT void Config(HWND appHandle) {
 
 const char* GetDateiname(const BauParameter& bau_parameter, Kilometrierung kilometrierung, std::optional<int> ueberlaenge_hm) {
   snprintf(g_outDatei, sizeof(g_outDatei)/sizeof(g_outDatei[0]),
-      "%s\\Hekto%s%s%s_%s%d_%d%s.ls3", g_zielverzeichnis,
+      "%s\\Hekto%s%s%s%s_%s%d_%d%s.ls3", g_zielverzeichnis,
       (bau_parameter.mast == Mast::kMitMast ? "_Mast" : ""),
       (bau_parameter.beidseitig == Beidseitig::kBeidseitig ? "_beids" : ""),
       (bau_parameter.groesse == Groesse::kKlein ? "_klein" : ""),
+      (bau_parameter.rueckstrahlend == Rueckstrahlend::kYes ? "_rueckstrahlend" : ""),
       (kilometrierung.istNegativ() ? "-" : ""),
       std::abs(kilometrierung.km),
       std::abs(kilometrierung.hm),
