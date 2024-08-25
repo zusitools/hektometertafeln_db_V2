@@ -32,6 +32,7 @@ endif()
 add_library(hektometertafeln_DB_V2 SHARED ${SOURCES})
 
 if (WIN32)
+  target_compile_definitions(hektometertafeln_DB_V2 PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
   target_link_libraries(hektometertafeln_DB_V2 shlwapi)
 endif()
 

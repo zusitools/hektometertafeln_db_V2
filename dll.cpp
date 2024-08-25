@@ -7,9 +7,11 @@
 #include "hekto_builder.hpp"
 
 #include <shlwapi.h>
+#include <windows.h>
 
 #include <array>
 #include <cassert>
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -37,11 +39,20 @@ enum class Standort : std::uint8_t {
   kMontageAmAnkerpunkt = 1,
 };
 
+void Fehlermeldung(const char* format, ...) {
+    char buffer[1024];
+    std::va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    MessageBoxA(NULL, buffer, "Error", MB_OK | MB_ICONERROR);
+}
+
 DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
   HKEY key;
   g_zusi_datenpfad_laenge = MAX_PATH;
   if (!SUCCEEDED(RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Zusi3", 0, KEY_READ, &key))) {
-    fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+    Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
     return 0;
   }
 
@@ -75,37 +86,37 @@ DLL_EXPORT uint32_t Init(const char* zielverzeichnis) {
     PathRemoveFileSpec(buf.data());
     if (PathFileExists((std::string(buf.data()) + "\\_InstSetup\\usb.dat").c_str())) {
       if (!liesDatenverzeichnis("DatenVerzeichnis")) {
-        fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+        Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
         return 0;
       }
     } else {
       if (!liesDatenverzeichnis("DatenVerzeichnisSteam")) {
-        fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+        Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
         return 0;
       }
     }
   } else if (hatDatenverzeichnisRegulaer) {
     if (!liesDatenverzeichnis("DatenVerzeichnis")) {
-      fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+      Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
       return 0;
     }
   } else if (hatDatenverzeichnisSteam) {
     if (!liesDatenverzeichnis("DatenVerzeichnisSteam")) {
-      fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+      Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
       return 0;
     }
   } else {
-    fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+    Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
     return 0;
   }
 
   if (!PathAppend(g_zielverzeichnis, zielverzeichnis)) {
-    fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+    Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
     return 0;
   }
 
   if (!PathAppend(g_zielverzeichnis, "Hektometertafeln")) {
-    fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+    Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
     return 0;
   }
 
@@ -191,7 +202,7 @@ DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
     std::optional { Kilometrierung::fromMeter(wert_m).toHektometer() - km_basis.toHektometer() } : std::nullopt;
 
   if (ueberlaenge_hm.has_value() && ((ueberlaenge_hm < 0) || (ueberlaenge_hm > kMaxUeberlaenge))) {
-    fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+    Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
     return 0;
   }
 
@@ -208,7 +219,7 @@ DLL_EXPORT uint8_t Erzeugen(float wert_m, uint8_t modus, const char** datei) {
 
   *datei = GetDateiname(bauparameter, km_basis, ueberlaenge_hm) + g_zusi_datenpfad_laenge;
   if (!CreateDirectoryWithParents(g_zielverzeichnis)) {
-    fprintf(stderr, "failed at %s:%d\n", __FILE__, __LINE__);
+    Fehlermeldung("failed at %s:%d\n", __FILE__, __LINE__);
     return 0;
   }
 
